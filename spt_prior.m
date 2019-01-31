@@ -23,7 +23,7 @@ Gm1 = sptm1(:,2); % Gexp in measurement number 1, vector along time
 Im1 = sptm1(:,3); % Iexp in measurement number 1, vector along time
 disp(Gm1(1));
 
-[bnet, nodes_map]= make_ode_bnet(Gm1, Im1);
+[bnet, nodes_map]= make_spt_bnet(Gm1, Im1);
 n = 11;
 
 % parameter learning
@@ -99,7 +99,7 @@ function [intra, inter, nodes_map]= get_valid_nodes_graph(node_names, edges_intr
 end
 
 % To generate a conditional gaussian model
-function [bnet, nodes_map]= make_ode_bnet(Gm, Im)
+function [bnet, nodes_map]= make_spt_bnet(Gm, Im)
     % Define nodes and intra-slice and inter-slice edges between them 
     node_names=  { 'lamda', 'k', 'Npatch' ,'Nisg', 'Rpbc', 'G', 'I', 'Gref', 'Gobs','Iref', 'Iobs'};
     % Intra - in one time slice
