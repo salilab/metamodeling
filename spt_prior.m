@@ -19,11 +19,11 @@
 
 % Read in the experimental measurements
 sptm1 = importdata('spt_obs1_avr.dat');
-Gm1 = sptm1(:,2); % Gexp in measurement number 1, vector along time
-Im1 = sptm1(:,3); % Iexp in measurement number 1, vector along time
-disp(Gm1(1));
+Go1 = sptm1(:,2); % Gexp in measurement number 1, vector along time
+Io1 = sptm1(:,3); % Iexp in measurement number 1, vector along time
+disp(Go1(1));
 
-[bnet, nodes_map]= make_spt_bnet(Gm1, Im1);
+[bnet, nodes_map, intra, inter]= make_spt_bnet(Go1, Io1);
 n = 11;
 
 % parameter learning
@@ -99,7 +99,7 @@ function [intra, inter, nodes_map]= get_valid_nodes_graph(node_names, edges_intr
 end
 
 % To generate a conditional gaussian model
-function [bnet, nodes_map]= make_spt_bnet(Gm, Im)
+function [bnet, nodes_map, intra, inter]= make_spt_bnet(Gm, Im)
     % Define nodes and intra-slice and inter-slice edges between them 
     node_names=  { 'lamda', 'k', 'Npatch' ,'Nisg', 'Rpbc', 'G', 'I', 'Gref', 'Gobs','Iref', 'Iobs'};
     % Intra - in one time slice
@@ -111,8 +111,8 @@ function [bnet, nodes_map]= make_spt_bnet(Gm, Im)
     disp("size")
     disp(n)
     ns = ones(1, n);% all cts nodes are scalar
-    dnodes= []; % descrete nodes
-    cnodes = mysetdiff(1:n, dnodes); % all are continuous nodes except for dnodes
+    %dnodes= []; % descrete nodes
+    %cnodes = mysetdiff(1:n, dnodes); % all are continuous nodes except for dnodes
     %onodes= cnodes; % observed nodes
     %ns(dnodes) = 1; % descrete nodes have one value, one simulation for each setup
     % "Equivalence classes" specify how the template is initiated and rolled
@@ -139,14 +139,14 @@ function [bnet, nodes_map]= make_spt_bnet(Gm, Im)
     eclass2(nodes_map('Nisg'))= 4;
     eclass2(nodes_map('Rpbc'))= 5;
     eclass2(nodes_map('G'))= 12;
-    eclass2(nodes_map('Gref'))= 13;
-    eclass2(nodes_map('Gobs'))= 14;
-    eclass2(nodes_map('I'))= 15;
-    eclass2(nodes_map('Iref'))= 16;
-    eclass2(nodes_map('Iobs'))= 17;
+    eclass2(nodes_map('Gref'))= 7;
+    eclass2(nodes_map('Gobs'))= 8;
+    eclass2(nodes_map('I'))= 13;
+    eclass2(nodes_map('Iref'))= 10;
+    eclass2(nodes_map('Iobs'))= 11;
     % make the dbn
     bnet = mk_dbn(intra, inter, ns, ...
-        'discrete', dnodes, ...
+        'discrete', [ ], ...
         'eclass1', eclass1, ...
         'eclass2', eclass2);
     % Specify distributions for CPDs, mu is mean, Sigma is cov,  W is
@@ -163,21 +163,15 @@ function [bnet, nodes_map]= make_spt_bnet(Gm, Im)
     bnet.CPD{4} = gaussian_CPD(bnet, nodes_map('Nisg'), 'mean', 300, 'cov', 20);
     bnet.CPD{5} = gaussian_CPD(bnet, nodes_map('Rpbc'), 'mean', 4, 'cov', 0.1);
     bnet.CPD{6} = gaussian_CPD(bnet, nodes_map('G'),   'mean', Gm(1), 'cov', 2);
-    bnet.CPD{7} = gaussian_CPD(bnet, nodes_map('Gref'),   'mean', Gm(1), 'cov', 2);
-    bnet.CPD{8} = gaussian_CPD(bnet, nodes_map('Gobs'), 'mean', Gm(1), 'cov', 2);
+    bnet.CPD{7} = gaussian_CPD(bnet, nodes_map('Gref'),   'mean', Gm(1), 'cov', 2,'weights', 1);
+    bnet.CPD{8} = gaussian_CPD(bnet, nodes_map('Gobs'), 'mean', Gm(1), 'cov', 2, 'weights', 1);
     bnet.CPD{9} = gaussian_CPD(bnet, nodes_map('I'),   'mean', Im(1), 'cov', 5);
-    bnet.CPD{10} = gaussian_CPD(bnet, nodes_map('Iref'),   'mean', Im(1), 'cov', 5);
-    bnet.CPD{11} = gaussian_CPD(bnet, nodes_map('Iobs'), 'mean', Im(1), 'cov', 5);
+    bnet.CPD{10} = gaussian_CPD(bnet, nodes_map('Iref'),   'mean', Im(1), 'cov', 5, 'weights', 1);
+    bnet.CPD{11} = gaussian_CPD(bnet, nodes_map('Iobs'), 'mean', Im(1), 'cov', 5, 'weights', 1);
   
     %eclass2
     weights_G= [0.5 0.5];
     bnet.CPD{12} = gaussian_CPD(bnet, nodes_map('G')+n, 'mean', Gm(n), 'cov', 2, 'weights', weights_G);
-    
-    weights_Gref= 1;
-    bnet.CPD{13} = gaussian_CPD(bnet, nodes_map('Gref')+n, 'mean', Gm(n), 'cov', 2,  'weights', weights_Gref);
-    
-    weights_Gobs= 1;
-    bnet.CPD{14} = gaussian_CPD(bnet, nodes_map('Gobs')+n, 'mean', Gm(n), 'cov', 2,  'weights', weights_Gobs);
     
     weights_I=zeros(6,1);
     disp(nodes_map('k'));
@@ -192,13 +186,7 @@ function [bnet, nodes_map]= make_spt_bnet(Gm, Im)
     weights_I(nodes_map('Rpbc')-1)= 0.05;
     weights_I(nodes_map('G')-1)= 0.6;
     weights_I(nodes_map('I')-1)= 0.6;
-    bnet.CPD{15} = gaussian_CPD(bnet, nodes_map('I')+n, 'mean', Im(n), 'cov', 5, 'weights', weights_I);
-    %bnet.CPD{15} = gaussian_CPD(bnet, nodes_map('I')+n, 'mean', 70, 'cov', 5);
-    
-    weights_Iref= 1;
-    bnet.CPD{16} = gaussian_CPD(bnet, nodes_map('Iref')+n, 'mean', Im(n), 'cov', 5,  'weights', weights_Iref);
-    
-    weights_Iobs= 1;
-    bnet.CPD{17} = gaussian_CPD(bnet, nodes_map('Iobs')+n, 'mean', Im(n), 'cov', 5,  'weights', weights_Iobs);
-end
+    bnet.CPD{13} = gaussian_CPD(bnet, nodes_map('I')+n, 'mean', Im(n), 'cov', 5, 'weights', weights_I);
+    %bnet.CPD{13} = gaussian_CPD(bnet, nodes_map('I')+n, 'mean', 70, 'cov', 5);
+end    
 
