@@ -36,27 +36,31 @@ function [bnet, nodes_map, node_names, edges_intra, edges_inter, ns, eclass1, ec
     disp("check")
     disp(nodes_map('alpha'));
     
-    eclass1 = zeros(n,1); 
-    eclass1(nodes_map('alpha'))= 1;
-    eclass1(nodes_map('beta'))= 2;
-    eclass1(nodes_map('h'))= 3;
-    eclass1(nodes_map('G'))= 4;
-    eclass1(nodes_map('Gref'))= 5;
-    eclass1(nodes_map('Gexp'))= 6;
-    eclass1(nodes_map('I'))= 7;
-    eclass1(nodes_map('Iref'))= 8;
-    eclass1(nodes_map('Iexp'))= 9;
+    eclass1_map= containers.Map();
+    eclass1_map('alpha')=1;
+    eclass1_map('beta')=2;
+    eclass1_map('h')= 3;
+    eclass1_map('G')= 4;
+    eclass1_map('Gref')= 5;
+    eclass1_map('Gexp')= 6;
+    eclass1_map('I')= 7;
+    eclass1_map('Iref')= 8;
+    eclass1_map('Iexp')= 9;
     
-    eclass2 = zeros(n,1); 
-    eclass2(nodes_map('alpha'))= 1;
-    eclass2(nodes_map('beta'))= 2;
-    eclass2(nodes_map('h'))= 3;
-    eclass2(nodes_map('G'))= 10;
-    eclass2(nodes_map('Gref'))= 11;
-    eclass2(nodes_map('Gexp'))= 12;
-    eclass2(nodes_map('I'))= 13;
-    eclass2(nodes_map('Iref'))= 14;
-    eclass2(nodes_map('Iexp'))= 15;
+    eclass2_map= containers.Map();
+    eclass2_map('alpha')= 1;
+    eclass2_map('beta')= 2;
+    eclass2_map('h')= 3;
+    eclass2_map('G')= 10;
+    eclass2_map('Gref')= 11;
+    eclass2_map('Gexp')= 12;
+    eclass2_map('I')= 13;
+    eclass2_map('Iref')= 14;
+    eclass2_map('Iexp')= 15;
+    
+    eclass1= get_eclass_from_maps(eclass1_map, nodes_map);
+    eclass2= get_eclass_from_maps(eclass2_map, nodes_map);  
+
     
     % make the dbn
     bnet = mk_dbn(intra, inter, ns, ...
@@ -88,13 +92,13 @@ function [bnet, nodes_map, node_names, edges_intra, edges_inter, ns, eclass1, ec
     weights_G= 0.5;
     bnet.CPD{10} = gaussian_CPD(bnet, nodes_map('G')+n, 'mean', Gm(n), 'cov', 0.1,  'weights', weights_G);
     
-    weights_Gref= 1;
-    bnet.CPD{11} = gaussian_CPD(bnet, nodes_map('Gref')+n, 'mean', Gm(n), 'cov', 0.1,  'weights', weights_Gref);
+    weights_Gref= 1;n_CPD(bnet, nodes_map('Gref')+n, 'mean', Gm(n), 'cov', 0.1,  'weights', weights_Gref);
     
     weights_Gexp= 1;
     bnet.CPD{12} = gaussian_CPD(bnet, nodes_map('Gexp')+n, 'mean', Gm(n), 'cov', 0.1,  'weights', weights_Gexp);
     
     weights_I=zeros(5,1);
+    bnet.CPD{11} = gaussia
     disp(nodes_map('alpha'));
     disp(nodes_map('beta'));
     disp(nodes_map('h'));
