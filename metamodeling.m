@@ -9,14 +9,14 @@ sptm1 = importdata('spt_obs1_avr.dat');
 Go1 = sptm1(:,2); % Gexp in measurement number 1, vector along time
 Io1 = sptm1(:,3); % Iexp in measurement number 1, vector along time
 
-for time  = 1:length(Gm1)
-    [bnet, nodes_map] = make_meta_bnet(Gm1, Im1, Go1, Io1, time);
-end
-%[bnet, nodes_map] = make_meta_bnet(Gm1, Im1, Go1, Io1, 1);
+%for time  = 1:length(Gm1)
+%    [bnet, nodes_map] = make_meta_bnet(Gm1, Im1, Go1, Io1, time);
+%end
+[bnet, nodes_map] = make_meta_bnet(Gm1, Im1, Go1, Io1, 1);
 
 % parameter learning
 npers= bnet.nnodes_per_slice;
-T = 200; % lengthhs of sequences to explore
+T = 20; % lengthhs of sequences to explore
 disp(npers);
 % Sample from the posterior:
 %disp(length(bnet.intra))
