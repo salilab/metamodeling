@@ -9,14 +9,14 @@ sptm1 = importdata('spt_obs1_avr.dat');
 Go1 = sptm1(:,2); % Gexp in measurement number 1, vector along time
 Io1 = sptm1(:,3); % Iexp in measurement number 1, vector along time
 
-for time  = 1:length(Gm1)
-    [bnet, nodes_map] = make_meta_bnet(Gm1, Im1, Go1, Io1, time);
-end
-%[bnet, nodes_map] = make_meta_bnet(Gm1, Im1, Go1, Io1, 1);
+%for time  = 1:length(Gm1)
+%    [bnet, nodes_map] = make_meta_bnet(Gm1, Im1, Go1, Io1, time);
+%end
+[bnet, nodes_map] = make_meta_bnet(Gm1, Im1, Go1, Io1, 1);
 
 % parameter learning
 npers= bnet.nnodes_per_slice;
-T = 200; % lengthhs of sequences to explore
+T = 20; % lengthhs of sequences to explore
 disp(npers);
 % Sample from the posterior:
 %disp(length(bnet.intra))
@@ -53,7 +53,7 @@ disp(mean(y));
 disp(std(y));
 %f = ksdensity(y,xx);
 %plot(xx,area*f,'g-')
-legend('ODE.beta, posterior');
+legend('ODE.beta, prior');
 hold off;
 
 function [bnet, nodes_map]=make_meta_bnet(Gm, Im, Go, Io, time)
@@ -83,7 +83,7 @@ function [bnet, nodes_map]=make_meta_bnet(Gm, Im, Go, Io, time)
     disp(meta_edges_intra);
 
     % get valid nodes graph for the meta-model
-    [meta_intra, meta_inter, nodes_map, reverse_nodes_map]= get_valid_nodes_graph(meta_node_names, meta_edges_intra, meta_edges_inter);
+    [meta_intra, meta_inter, nodes_map, meta_reverse_nodes_map]= get_valid_nodes_graph(meta_node_names, meta_edges_intra, meta_edges_inter);
 
     disp('check');
     %disp(meta_reverse_nodes_map);
@@ -147,77 +147,23 @@ function [bnet, nodes_map]=make_meta_bnet(Gm, Im, Go, Io, time)
         'eclass2', eclass2);
     
     % eclass1
-    bnet.CPD{1} = gaussian_CPD(bnet, nodes_map('ODE.alpha'),   'mean', 0.05, 'cov', 0.001);
-    bnet.CPD{2} = gaussian_CPD(bnet, nodes_map('ODE.beta'),   'mean', 0.11, 'cov', 0.002);
-    bnet.CPD{3} = gaussian_CPD(bnet, nodes_map('ODE.h'),   'mean', 6.1, 'cov', 0.1);
-    bnet.CPD{4} = gaussian_CPD(bnet, nodes_map('ODE.G'),   'mean', Gm(1), 'cov', 0.1);
-    bnet.CPD{5} = gaussian_CPD(bnet, nodes_map('ODE.Gref'),   'mean', Gm(1), 'cov', 0.1,'weights', 1);
-    bnet.CPD{6} = gaussian_CPD(bnet, nodes_map('ODE.Gexp'), 'mean', Gm(1), 'cov', 0.1, 'weights', 1);
-    bnet.CPD{7} = gaussian_CPD(bnet, nodes_map('ODE.I'),   'mean', Im(1), 'cov', 5);
-    bnet.CPD{8} = gaussian_CPD(bnet, nodes_map('ODE.Iexp'), 'mean', Im(1), 'cov', 5, 'weights', 1);
-    bnet.CPD{9} = gaussian_CPD(bnet, nodes_map('SPT.lambda'), 'mean', 0.1, 'cov', 0.01);
-    bnet.CPD{10} = gaussian_CPD(bnet, nodes_map('SPT.k'), 'mean', 10, 'cov', 1);
-    bnet.CPD{11} = gaussian_CPD(bnet, nodes_map('SPT.Npatch'), 'mean', 6, 'cov', 0.5);
-    bnet.CPD{12} = gaussian_CPD(bnet, nodes_map('SPT.Nisg'), 'mean', 300, 'cov', 20);
-    bnet.CPD{13} = gaussian_CPD(bnet, nodes_map('SPT.Rpbc'), 'mean', 4, 'cov', 0.1);
-    bnet.CPD{14} = gaussian_CPD(bnet, nodes_map('SPT.G'),   'mean', Gm(1), 'cov', 2);
-    bnet.CPD{15} = gaussian_CPD(bnet, nodes_map('SPT.Gref'),   'mean', Gm(1), 'cov', 2,'weights', 1);
-    bnet.CPD{16} = gaussian_CPD(bnet, nodes_map('SPT.Gobs'), 'mean', Gm(1), 'cov', 2, 'weights', 1);
-    bnet.CPD{17} = gaussian_CPD(bnet, nodes_map('SPT.I'),   'mean', Im(1), 'cov', 5);
-    bnet.CPD{18} = gaussian_CPD(bnet, nodes_map('Reference.I'),   'mean', Im(1), 'cov', 5, 'weights', [0.5 0.5]);
-    bnet.CPD{19} = gaussian_CPD(bnet, nodes_map('SPT.Iobs'), 'mean', Im(1), 'cov', 5, 'weights', 1);
-  
+    for i = 1:7
+        bnet.CPD{i} = ode_bnet.CPD{i}
+    end
+    bnet.CPD{8} = ode_bnet.CPD{9};
+    for i = 9:17
+        bnet.CPD{i} = spt_bnet.CPD{i-8}
+    end
+    %disp(nodes_map('Reference.I'));
+    weights_Iref1= [0.5 0.5];
+    bnet.CPD{18} = gaussian_CPD(bnet, nodes_map('Reference.I'), 'mean', Im(1), 'cov', 5,  'weights', weights_Iref1);
+    bnet.CPD{19} = spt_bnet.CPD{end};
+    
+    %disp(bnet.CPD{1});
+    
     % eclass2
-    bnet.CPD{20} = gaussian_CPD(bnet, nodes_map('ODE.G')+n, 'mean', Gm(time), 'cov', 0.1,  'weights', 0.5);
-    
-    % CPD for I(t+1), assume for now all parents are continuous
-    parents_I1= parents(bnet.dag, nodes_map('ODE.I')+n); % parents of I(t+1)
-    weights_I1_map_T0= containers.Map(); % parents in slice t
-    weights_I1_map_T1= containers.Map(); % parents in slice t+1
-    weights_I1_map_T0('ODE.G')= 0.05;
-    weights_I1_map_T0('ODE.I')= 0.6;
-    weights_I1_map_T1('ODE.alpha')= 0.6;
-    weights_I1_map_T1('ODE.beta')= 0.6;
-    weights_I1_map_T1('ODE.h')= 0.6;
-    weights_I1= zeros(length(parents_I1),1);
-    for i=1:length(parents_I1) 
-        parent_index= parents_I1(i);
-        if (parent_index <= n) % parent in slice t
-            parent_name= reverse_nodes_map(parent_index);
-            weights_I1(i)= weights_I1_map_T0(parent_name);
-        else % parent in slice t+1
-            parent_name= reverse_nodes_map(parent_index-n); % we only have a map for 1..9
-            weights_I1(i)= weights_I1_map_T1(parent_name);
-        end
-    end
-    bnet.CPD{21} = gaussian_CPD(bnet, nodes_map('ODE.I')+n,   'mean', Im(time), 'cov', 5, 'weights', weights_I1);
-    %bnet.CPD{16} = gaussian_CPD(bnet, nodes_map('I')+n,   'mean', 72, 'cov', 5);
-    weights_G= [0.5 0.5];
-    bnet.CPD{22} = gaussian_CPD(bnet, nodes_map('SPT.G')+n, 'mean', Gm(time), 'cov', 2, 'weights', weights_G);
-    
-    % CPD for I(t+1), assume for now all parents are continuous
-    parents_I1= parents(bnet.dag, nodes_map('SPT.I')+n); % parents of I(t+1)
-    weights_I1_map_T0= containers.Map(); % parents in slice t
-    weights_I1_map_T1= containers.Map(); % parents in slice t+1
-    weights_I1_map_T0('SPT.G')= 0.05;
-    weights_I1_map_T0('SPT.I')= 0.6;
-    weights_I1_map_T1('SPT.k')= 0.6;
-    weights_I1_map_T1('SPT.Npatch')= 0.6;
-    weights_I1_map_T1('SPT.Nisg')= 0.6;
-    weights_I1_map_T1('SPT.Rpbc')= 0.05;
-    weights_I1= zeros(length(parents_I1),1);
-    for i=1:length(parents_I1) 
-        parent_index= parents_I1(i);
-        if (parent_index <= n) % parent in slice t
-            parent_name= reverse_nodes_map(parent_index);
-            weights_I1(i)= weights_I1_map_T0(parent_name);
-        else % parent in slice t+1
-            parent_name= reverse_nodes_map(parent_index-n); % we only have a map for 1..9
-            weights_I1(i)= weights_I1_map_T1(parent_name);
-        end
-    end
-    
-    bnet.CPD{23} = gaussian_CPD(bnet, nodes_map('SPT.I')+n, 'mean', Im(time), 'cov', 5, 'weights', weights_I1);
-    %bnet.CPD{13} = gaussian_CPD(bnet, nodes_map('I')+n, 'mean', 70, 'cov', 5);
-    
+    bnet.CPD{20} = ode_bnet.CPD{10};
+    bnet.CPD{21} = ode_bnet.CPD{11};
+    bnet.CPD{22} = spt_bnet.CPD{12};
+    bnet.CPD{23} = spt_bnet.CPD{13};
 end

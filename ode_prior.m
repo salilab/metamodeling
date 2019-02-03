@@ -24,7 +24,9 @@ Gm1 = odem1(:,2); % Gexp in measurement number 1, vector along time
 Im1 = odem1(:,3); % Iexp in measurement number 1, vector along time
 disp(Gm1(1));
 
-[bnet, nodes_map, intra, inter]= make_ode_bnet(Gm1, Im1);
+for time  = 1:length(Gm1)
+    [bnet, nodes_map, intra, inter]= make_ode_bnet(Gm1, Im1,time);
+end
 n = 9;
 
 % parameter learning
@@ -40,7 +42,15 @@ disp(npers);
 sample_seq=  cell2mat(sample_dbn(bnet, 'length', T));
 nodes_order= cell2mat(values(nodes_map));
 
-% Plot
+% Plot ODE.G and ODE.I
+%figure()
+%yyaxis left;
+%plot(1:T, sample_seq(nodes_map('ODE.G'),:));
+%yyaxis right;
+%plot(1:T, sample_seq(nodes_map('ODE.I'),:));
+%legend('ODE.G','ODE.I');  
+
+% Plot the distribution of ODE.beta
 disp('plot');
 fprintf("Sampled time-series of length %d", T);
 y = sample_seq(nodes_map('ODE.beta'),:);
@@ -58,11 +68,11 @@ disp(mean(y));
 disp(std(y));
 %f = ksdensity(y,xx);
 %plot(xx,area*f,'g-')
-legend('beta, prior');
+legend('ODE.beta, prior');
 hold off;
 
 % To generate a conditional gaussian model
-function [bnet, nodes_map, intra, inter]= make_ode_bnet(Gm, Im)
+function [bnet, nodes_map, intra, inter]= make_ode_bnet(Gm, Im, time)
     % Define nodes and intra-slice and inter-slice edges between them 
     node_names=  horzcat(strcat('ODE.', {'alpha', 'beta', 'h' ,'G',  'I', 'Gref', 'Gexp', 'Iexp'}), 'Reference.I');
     % Intra - in one time slice
@@ -80,8 +90,8 @@ function [bnet, nodes_map, intra, inter]= make_ode_bnet(Gm, Im)
     % "Equivalence classes" specify how the template is initiated and rolled
     % Specify which CPD is associates with each node in either time
     % slice 1 (eclass1) or in slice 2 onwards (eclass2)
-    disp("check")
-    disp(nodes_map('ODE.alpha'));
+    %disp("check")
+    %disp(nodes_map('ODE.alpha'));
     
     eclass1_map= containers.Map();
     eclass1_map('ODE.alpha')=1;
@@ -107,7 +117,7 @@ function [bnet, nodes_map, intra, inter]= make_ode_bnet(Gm, Im)
     
     eclass1= get_eclass_from_maps(eclass1_map, nodes_map);
     eclass2= get_eclass_from_maps(eclass2_map, nodes_map);  
-
+    disp(eclass2);
     
     % make the dbn
     bnet = mk_dbn(intra, inter, ns, ...
@@ -134,8 +144,7 @@ function [bnet, nodes_map, intra, inter]= make_ode_bnet(Gm, Im)
     bnet.CPD{9} = gaussian_CPD(bnet, nodes_map('ODE.Iexp'), 'mean', Im(1), 'cov', 5, 'weights', 1);
     
     % eclass2
-    bnet.CPD{10} = gaussian_CPD(bnet, nodes_map('ODE.G')+n, 'mean', Gm(n), 'cov', 0.1,  'weights', 0.5);
-    
+    bnet.CPD{10} = gaussian_CPD(bnet, nodes_map('ODE.G')+n, 'mean', Gm(time), 'cov', 0.1,  'weights', 0.5);
     
     % CPD for I(t+1), assume for now all parents are continuous
     parents_I1= parents(bnet.dag, nodes_map('ODE.I')+n); % parents of I(t+1)
@@ -157,11 +166,12 @@ function [bnet, nodes_map, intra, inter]= make_ode_bnet(Gm, Im)
             weights_I1(i)= weights_I1_map_T1(parent_name);
         end
     end
-    bnet.CPD{11} = gaussian_CPD(bnet, nodes_map('ODE.I')+n,   'mean', Im(n), 'cov', 5, 'weights', weights_I1);
+    bnet.CPD{11} = gaussian_CPD(bnet, nodes_map('ODE.I')+n,   'mean', Im(time), 'cov', 5, 'weights', weights_I1);
     %bnet.CPD{16} = gaussian_CPD(bnet, nodes_map('I')+n,   'mean', 72, 'cov', 5);
     
-    disp('here');
-    disp(max(eclass2));
-    disp('here');
+    %disp('here');
+    %disp(max(eclass2));
+    %disp('here');
+    %disp(bnet)
 end
 
