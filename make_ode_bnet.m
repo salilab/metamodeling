@@ -94,7 +94,7 @@ function [bnet, nodes_map, node_names, edges_intra, edges_inter, ns, eclass1, ec
             assert(boolean(0))
         end
     end
-
+G(t+1) = Gm(1) + 1.0*G(t+1)
     bnet.CPD{3} = gaussian_CPD(bnet, nodes_map('ODE.G_minus_h'), 'mean', 0.0, 'cov', 0.00001, 'weights', weights_G_minus_h, 'clamp_mean', 1, 'clamp_cov', 1, 'clamp_weights', 1); 
     bnet.CPD{4} = gaussian_CPD(bnet, nodes_map('ODE.Gref'),   'mean', 0.0,   'cov', 0.2, 'weights', 1.0); % COMMENT BR: - changed mean from [Gm(1)+1.0*G(t+1)]    to [1.0*G(t+1)] ; increased variance to reflect the intuition that ODE is a less accurate model of Gref than Gexp (this is quite arbitraty)
     bnet.CPD{5} = gaussian_CPD(bnet, nodes_map('ODE.Gexp'),   'mean', 0.0,   'cov', 0.1, 'weights', 1.0);  % COMMENT BR: Changed mean from  [Gm(1)+1.0*Gref(t+1)] to [1.0*Gref(t+1)]
@@ -108,6 +108,8 @@ function [bnet, nodes_map, node_names, edges_intra, edges_inter, ns, eclass1, ec
     % CPD for G(t+1)
     bnet.CPD{9} = gaussian_CPD(bnet, nodes_map('ODE.G')+n, 'mean', 0.0, 'cov', 0.1,  'weights', 1.0); % COMMENT BR: changed mean of G(t+1) from 0.5*G(t)+Gm(time) to 1.0*G(t)
     % CPD for I(t+1), assume for now all parents are continuous
+    % I(t+1) := Normal dist. E = (1-alpha) * I(t) + alpha * beta * (G(t)-h)
+    % ; covariance = 5.0
     parents_I1= parents(bnet.dag, nodes_map('ODE.I')+n); % parents of I(t+1)
     weights_I1_map_T0= containers.Map(); % parents in slice t
     weights_I1_map_T1= containers.Map(); % parents in slice t+1
