@@ -94,8 +94,7 @@ function [bnet, nodes_map, node_names, edges_intra, edges_inter, ns, eclass1, ec
             assert(boolean(0))
         end
     end
-G(t+1) = Gm(1) + 1.0*G(t+1)
-    bnet.CPD{3} = gaussian_CPD(bnet, nodes_map('ODE.G_minus_h'), 'mean', 0.0, 'cov', 0.00001, 'weights', weights_G_minus_h, 'clamp_mean', 1, 'clamp_cov', 1, 'clamp_weights', 1); 
+    bnet.CPD{3} = gaussian_CPD(bnet, nodes_map('ODE.G_minus_h'), 'mean', 0.0, 'cov', 0.00001, 'weights', weights_G_minus_h, 'clamp_mean', 1, 'clamp_cov', 1, 'clamp_weights', 1);  % G_minus_h ~ Norm(E(G)-E(h))
     bnet.CPD{4} = gaussian_CPD(bnet, nodes_map('ODE.Gref'),   'mean', 0.0,   'cov', 0.2, 'weights', 1.0); % COMMENT BR: - changed mean from [Gm(1)+1.0*G(t+1)]    to [1.0*G(t+1)] ; increased variance to reflect the intuition that ODE is a less accurate model of Gref than Gexp (this is quite arbitraty)
     bnet.CPD{5} = gaussian_CPD(bnet, nodes_map('ODE.Gexp'),   'mean', 0.0,   'cov', 0.1, 'weights', 1.0);  % COMMENT BR: Changed mean from  [Gm(1)+1.0*Gref(t+1)] to [1.0*Gref(t+1)]
     bnet.CPD{6} = gaussian_CPD(bnet, nodes_map('ODE.I'),      'mean', Im(1), 'cov', 5.0); 
