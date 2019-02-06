@@ -34,11 +34,11 @@ classdef CPDFactory
             assert(rep_node_time_slice==0 || rep_node_time_slice==1)
             obj.rep_node_time_slice= rep_node_time_slice;
             if nargin>=5
+                if any(strcmp('weights', obj.non_weights_params))
+                    error('Cannot have weights specified both in non_weights_params and in weights_map_T0/1')
+                end
                 obj.weights_map_T0= weights_map_T0;
                 obj.weights_map_T1= weights_map_T1;
-            else
-                obj.weights_map_T0= containers.Map();
-                obj.weights_map_T1= containers.Map();
             end
         end  
        
@@ -49,12 +49,11 @@ classdef CPDFactory
             
             % Check if any discrete parents
             rep_node_index= nodes_map(obj.rep_node_name);
-            if obj.rep_node_time_slice==0
-                ps= parents(dbn.dag, rep_node_index);
-            else
-                n= dbn.nnodes_per_slice;
-                ps= parents(dbn.dag, rep_node_index + n); % + n == time slice t+1
+            n= dbn.nnodes_per_slice;
+            if obj.rep_node_time_slice==1
+                rep_node_index= rep_node_index + n;
             end
+            ps= parents(dbn.dag, rep_node_index);
             dps = myintersect(ps, dbn.dnodes);
             if ~isempty(dps)
                 error('CPDFactory does not yet support discrete parents') % if we want to support, will need to reorder mean and cov matrices if specified by order of parents
@@ -68,7 +67,7 @@ classdef CPDFactory
             if obj.rep_node_time_slice==0
                 cpd_index= dbn.eclass1(rep_node_index);
             else
-                cpd_index= dbn.eclass2(rep_node_index);
+                cpd_index= dbn.eclass2(rep_node_index - n);
             end
             dbn.CPD{cpd_index}= cpd;            
         end
@@ -86,28 +85,33 @@ classdef CPDFactory
             n= dbn.nnodes_per_slice;
             assert(n == nodes_map.Count);
             rep_node_index= nodes_map(obj.rep_node_name);
-            if obj.rep_node_time_slice==0
-                ps= parents(dbn.dag, rep_node_index);
-            else
-                ps= parents(dbn.dag, rep_node_index + n); % + n == time slice t+1
+            if obj.rep_node_time_slice==1
+                rep_node_index= rep_node_index + n;
             end
+            ps= parents(dbn.dag, rep_node_index);
             reverse_nodes_map= get_reverse_nodes_map(nodes_map);
-            weights= zeros(length(ps),1);
-            for i=1:length(ps)
-                parent_index= ps(i);
-                if (parent_index <= n) % parent in slice t
-                    parent_name= reverse_nodes_map(parent_index);
-                    weights(i)= obj.weights_map_T0(parent_name);
-                else % parent in slice t+1
-                    parent_name= reverse_nodes_map(parent_index);
-                    weights(i)= obj.weights_map_T1(parent_name);
+            if any(strcmp('weights', obj.non_weights_params))
+                cpd= gaussian_CPD(dbn, ...
+                    rep_node_index, ...
+                    obj.non_weights_params{:});
+            else
+                weights= zeros(length(ps),1);
+                for i=1:length(ps)
+                    parent_index= ps(i);
+                    if (parent_index <= n) % parent in slice t
+                        parent_name= reverse_nodes_map(parent_index);
+                        weights(i)= obj.weights_map_T0(parent_name);
+                    else % parent in slice t+1
+                        parent_name= reverse_nodes_map(parent_index);
+                        weights(i)= obj.weights_map_T1(parent_name);
+                    end
                 end
+                % Create CPD
+                cpd= gaussian_CPD(dbn, ...
+                    rep_node_index, ...
+                    obj.non_weights_params{:}, ...
+                    'weights', weights);            
             end
-            % Create CPD
-            cpd= gaussian_CPD(dbn, ...
-                nodes_map(obj.rep_node_name'), ...
-                obj.non_weights_params{:}, ...
-                'weights', weights);            
         end
     end
 end
