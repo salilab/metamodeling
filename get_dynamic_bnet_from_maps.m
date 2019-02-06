@@ -1,4 +1,4 @@
-function [dbn]= get_dynamic_bnet_from_maps(nodes_names, edges_inter, edges_intra, eclass1_map, eclass2_map, cpd_names)
+function [dbn]= get_dynamic_bnet_from_maps(nodes_names, edges_intra, edges_inter, eclass1_map, eclass2_map, cpd_factories)
     node_names=  horzcat(strcat('ODE.', {'h', 'G', 'G_minus_h', 'I', 'Gref', 'Gexp', 'Iexp'}), 'Reference.I'); % BARAK comment: removed alpha, beta (turned to weights) + added intermediate (G-h)
     n= length(node_names);
     ns = ones(1, n);% all cts nodes are scalar
@@ -30,10 +30,10 @@ function [dbn]= get_dynamic_bnet_from_maps(nodes_names, edges_inter, edges_intra
         'eclass1', eclass1, ...
         'eclass2', eclass2);
 
-    cpdfs={};
-    cpdfs{end+1}= CPDFactory ('Gaussian_CPD','ODE.h', 1,{'mean', 3.0, 'cov', 5.0});
-    for i=1:numel(cpdfs)
-        cpdf= cpdfs{i};
+    cpd_factories={};
+    cpd_factories{end+1}= CPDFactory ('Gaussian_CPD','ODE.h', 1,{'mean', 3.0, 'cov', 5.0});
+    for i=1:numel(cpd_factories)
+        cpdf= cpd_factories{i};
         create_and_associate_cpd(cpdf, dbn, nodes_map)
     end
 end
