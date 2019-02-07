@@ -1,4 +1,4 @@
-function [dbn]= get_dynamic_bnet_from_maps(node_names, edges_intra, edges_inter, eclass1_map, eclass2_map, CPD_factories)
+function [dbn, nodes_map, inter, intra]= get_dynamic_bnet_from_maps(node_names, edges_intra, edges_inter, eclass1_map, eclass2_map, CPD_factories)
     n= length(node_names);
     ns = ones(1, n);% all cts nodes are scalar
     % Create DAG
