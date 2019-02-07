@@ -15,19 +15,16 @@
 % Time-invariant variables
 % alpha beta h 
 %
-
 % To generate a conditional gaussian model
-function [bnet, node_names, edges_intra, edges_inter, eclass1_map, eclass2_map, CPDFactories]= make_ode_bnet(Gm, Im, time)
+function [node_names, edges_intra, edges_inter, eclass1_map, eclass2_map, CPDFactories]= make_ode_bnet(Gm, Im)
     node_names=  horzcat(strcat('ODE.', {'h', 'G', 'G_minus_h', 'I', 'Gref', 'Gexp', 'Iexp'}), 'Reference.I'); % BARAK comment: removed alpha, beta (turned to weights) + added intermediate (G-h)
     n= length(node_names);
-    ns = ones(1, n);% all cts nodes are scalar
     % Intra - in one time slice
     edges_intra1= strcat('ODE.', {'h', 'G_minus_h'; 'G', 'G_minus_h'; 'G', 'Gref'; 'Gref', 'Gexp'}); % BARAK comment: changed in accordance with change in nodes list
     edges_intra2= {'ODE.I','Reference.I'; 'Reference.I','ODE.Iexp'};
     edges_intra= [edges_intra1; edges_intra2];
     % Inter - between time slices
     edges_inter= strcat('ODE.', { 'G', 'G'; 'G_minus_h', 'I'; 'I', 'I' }); % BARAK comment: switched G->I and h->I to (G-h)->I
-    [intra, inter, nodes_map, ~]= get_valid_nodes_graph(node_names, edges_intra, edges_inter);
     eclass1_map= containers.Map();
     eclass2_map= containers.Map();
     for i=1:numel(node_names)
@@ -92,6 +89,5 @@ function [bnet, node_names, edges_intra, edges_inter, eclass1_map, eclass2_map, 
         CPDFactory('Gaussian_CPD', 'ODE.I', 1, ...
         {'mean', 0.0, 'cov', 5.0}, ...
         weights_I1_map_T0, weights_I1_map_T1);
-    bnet= get_dynamic_bnet_from_maps(node_names, edges_intra, edges_inter, eclass1_map, eclass2_map, CPDFactories);
- end
+  end
 
