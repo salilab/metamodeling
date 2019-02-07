@@ -8,15 +8,12 @@
 % Gref(t), Gref(t+1)
 % Iref(t), Iref(t+1)
 %
-% Observed variables
-% Gexp(t), Gexp(t+1)
-% Iexp(t), Iexp(t+1)
 %
 % Time-invariant variables
-% alpha beta h 
+% alpha beta h  % TODO: update
 %
 % To generate a conditional gaussian model
-function [node_names, edges_intra, edges_inter, eclass1_map, eclass2_map, CPDFactories]= make_ode_bnet(Gm, Im)
+function [dbn_factory]= make_ode_dbn_factory(Gm, Im)
     node_names=  horzcat(strcat('ODE.', {'h', 'G', 'G_minus_h', 'I', 'Gref', 'Gexp', 'Iexp'}), 'Reference.I'); % BARAK comment: removed alpha, beta (turned to weights) + added intermediate (G-h)
     n= length(node_names);
     % Intra - in one time slice
@@ -89,5 +86,8 @@ function [node_names, edges_intra, edges_inter, eclass1_map, eclass2_map, CPDFac
         CPDFactory('Gaussian_CPD', 'ODE.I', 1, ...
         {'mean', 0.0, 'cov', 5.0}, ...
         weights_I1_map_T0, weights_I1_map_T1);
+    dbn_factory= DBNFactory( ...
+        node_names, edges_intra, edges_inter, ...
+        eclass1_map, eclass2_map, CPDFactories);
   end
 

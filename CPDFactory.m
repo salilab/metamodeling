@@ -1,5 +1,5 @@
 classdef CPDFactory
-    % Descriptor of CPDs that uses string labels instead of numeral ids (so
+    % Factory for CPDs that uses string labels instead of numeral ids (so
     % more flexible) and supports some (not all yet) CPD types and params
     % Currently - only supporting Gaussin_CPD with continuous parents
     
@@ -42,7 +42,7 @@ classdef CPDFactory
             end
         end  
        
-        function cpd=create_and_associate_cpd(obj, dbn, nodes_map)
+        function [cpd, dbn]=create_and_associate_cpd(obj, dbn, nodes_map)
             % Create a new cpd according to factory parameters and
             % associate it with dynamic bayesian network dbn using
             % nodes_map to map node names to node indexes in dbn.dag
@@ -97,7 +97,7 @@ classdef CPDFactory
             else
                 weights= zeros(length(ps),1);
                 for i=1:length(ps)
-                    parent_index= ps(i);
+                    parent_index= ps(i);                    
                     if (parent_index <= n) % parent in slice t
                         parent_name= reverse_nodes_map(parent_index);
                         weights(i)= obj.weights_map_T0(parent_name);
