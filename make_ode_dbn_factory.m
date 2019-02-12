@@ -1,19 +1,25 @@
 % Make a DBN for the ODE model with the following variables
 %
 % Time-dependent variables
-%  -> G(t)  ->  G(t+1) ->
-%  -> I(t)  ->  I(t+1) ->
+%  -> ODE.G(t)  ->  ODE.G(t+1) ->
+%  -> ODE.I(t)  ->  ODE.I(t+1) ->
 %
 % Reference variables
-% Gref(t), Gref(t+1)
-% Iref(t), Iref(t+1)
+% ODE.Gref(t), ODE.Gref(t+1)
+% ODE.Iref(t), ODE.Iref(t+1)
 %
+% Observed variables
+% ODE.Gexp(t), ODE.Gexp(t+1)
+% ODE.Iexp(t), ODE.Iexp(t+1)
 %
 % Time-invariant variables
-% alpha beta h  % TODO: update
+% ODE.h 
+%
+% Parameters
+% ALPHA BETA
 %
 % To generate a conditional gaussian model
-function [dbn_factory]= make_ode_dbn_factory(Gm, Im)
+function [dbn_factory]= make_ode_dbn_factory(Gm, Im, time)
     node_names=  horzcat(strcat('ODE.', {'h', 'G', 'G_minus_h', 'I', 'Gref', 'Gexp', 'Iexp'}), 'Reference.I'); % BARAK comment: removed alpha, beta (turned to weights) + added intermediate (G-h)
     n= length(node_names);
     % Intra - in one time slice
@@ -33,9 +39,9 @@ function [dbn_factory]= make_ode_dbn_factory(Gm, Im)
     eclass2_map('ODE.G')= 'ODE.G.inter';
     eclass2_map('ODE.I')= 'ODE.I.inter';   
 
-    %%
+    
     % elcass1 (time-slice 0 or all parents are in the same time slice)
-    %%
+    
     CPDFactories= {};
     CPDFactories{end+1}=  ...
         CPDFactory('Gaussian_CPD', 'ODE.h', 0, ...
@@ -53,27 +59,27 @@ function [dbn_factory]= make_ode_dbn_factory(Gm, Im)
         weights_G_minus_h_map_T0, weights_G_minus_h_map_T1);  % G_minus_h ~ Norm(E(G)-E(h))
     CPDFactories{end+1} = ...
         CPDFactory('Gaussian_CPD', 'ODE.Gref', 0,   ...
-        {'mean', 0.0,   'cov', 0.2, 'weights', 1.0} ); % E= [1.0*G(t+1)] 
+        {'mean', 0.0,   'cov', 0.00001, 'weights', 1.0} ); % E= [1.0*G(t)] 
     CPDFactories{end+1} = ...
         CPDFactory('Gaussian_CPD', 'ODE.Gexp', 0, ...
-        {'mean', 0.0,   'cov', 0.1, 'weights', 1.0}); % E= [1.0*Gref(t+1)]
+        {'mean', 0.0,   'cov', 0.00001, 'weights', 1.0}); % E= [1.0*Gref(t)]
     CPDFactories{end+1} = ...
         CPDFactory('Gaussian_CPD', 'ODE.I', 0, ...
-        {'mean', Im(1), 'cov', 5.0} ); 
+        {'mean', Im(time), 'cov', 5.0} ); 
     CPDFactories{end+1} = ...
         CPDFactory('Gaussian_CPD', 'Reference.I', 0, ...
-        { 'mean', 0.0,   'cov', 10.0,   'weights', 1.0} ); 
+        { 'mean', Im(time),   'cov', 5.0,   'weights', 1.0} ); % E= [1.0*I(t)] 
     CPDFactories{end+1} = ...
         CPDFactory('Gaussian_CPD', 'ODE.Iexp', 0, ...   
-        {'mean', 0.0,   'cov', 5.0,   'weights', 1.0} ); 
+        {'mean', Im(time),   'cov', 5.0,   'weights', 1.0} ); % E= [1.0*Iref(t)]
     
-    %%
+    
     % eclass2 (time-slice t+1 with parents in the previous time slice)
-    %%
+    
     % CPD for G(t+1)
     CPDFactories{end+1} = ...
         CPDFactory('Gaussian_CPD', 'ODE.G', 1, ...
-        {'mean', 0.0, 'cov', 0.1,  'weights', 1.0} ); % E[ G(t+1) ] = 1.0*G(t)
+        {'mean', Gm(1), 'cov', 0.1,  'weights', 1.0} ); % E[ G(t+1) ] = 1.0*G(t)
     % CPD for I(t+1), assume for now all parents are continuous
     % I(t+1) := Normal dist. E = (1-alpha) * I(t) + alpha * beta * (G(t)-h)
     weights_I1_map_T0= containers.Map(); % parents in slice t
@@ -84,7 +90,7 @@ function [dbn_factory]= make_ode_dbn_factory(Gm, Im)
     weights_I1_map_T0('ODE.G_minus_h')= INITIAL_ALPHA * INITIAL_BETA;
     CPDFactories{end+1} = ...
         CPDFactory('Gaussian_CPD', 'ODE.I', 1, ...
-        {'mean', 0.0, 'cov', 5.0}, ...
+        {'mean', Im(time), 'cov', 5.0}, ...
         weights_I1_map_T0, weights_I1_map_T1);
     dbn_factory= DBNFactory( ...
         node_names, edges_intra, edges_inter, ...
