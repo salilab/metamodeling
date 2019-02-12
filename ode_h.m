@@ -1,19 +1,36 @@
-% Make a meta-modeling DBN for the ODE and SPT model
+% Make a DBN for the ODE model with the following variables
+%
+% Time-dependent variables
+%  -> G(t)  ->  G(t+1) ->
+%  -> I(t)  ->  I(t+1) ->
+%
+% Reference variables
+% Gref(t), Gref(t+1)
+% Iref(t), Iref(t+1)
+%
+% Observed variables
+% Gexp(t), Gexp(t+1)
+% Iexp(t), Iexp(t+1)
+%
+% Time-invariant variables
+% alpha beta h 
+%
+
+% check the time step of the equation, and see the G and I.
 
 % Read in the experimental measurements
 odem1 = importdata('ode_exp1_avr.dat');
 Gm1 = odem1(:,2); % Gexp in measurement number 1, vector along time
 Im1 = odem1(:,3); % Iexp in measurement number 1, vector along time
-
-sptm1 = importdata('spt_obs1_avr.dat');
-Go1 = sptm1(:,2); % Gexp in measurement number 1, vector along time
-Io1 = sptm1(:,3); % Iexp in measurement number 1, vector along time
+disp(Gm1(1));
 
 %for time  = 1:length(Gm1)
-%    [bnet, nodes_map] = make_meta_bnet(Gm1, Im1, Go1, Io1, time);
+%    [bnet, nodes_map, intra, inter]= make_ode_bnet(Gm1, Im1,time);
 %end
-[bnet, nodes_map] = make_meta_bnet(Gm1, Im1, Go1, Io1, 1);
+n = 9;
 
+time = 3
+[dbn_factory]= make_ode_dbn_factory(Gm1, Im1, time);
 % parameter learning
 npers= bnet.nnodes_per_slice;
 T = 400; % lengthhs of sequences to explore
@@ -53,30 +70,5 @@ disp(mean(y));
 disp(std(y));
 %f = ksdensity(y,xx);
 %plot(xx,area*f,'g-')
-legend('ODE.h, posterior');
+legend('ODE.h, prior');
 hold off;
-time =3
-function [meta_dbn, nodes_map]=make_meta_bnet(Gm, Im, Go, Io, time)
-
-    % make ODE and BD models
-    [ode_dbn_factory]= ...
-        make_ode_dbn_factory(Gm, Im, time);
-    [spt_dbn_factory]= ...
-        make_spt_dbn_factory(Go, Io, time);
-    meta_dbn_factory= ...
-        merge_dbn_factories(ode_dbn_factory, ...
-                              spt_dbn_factory);
-    weights_Iref_map_T0= containers.Map(); % parents in slice t
-    weights_Iref_map_T1= containers.Map(); % parents in slice t
-    weights_Iref_map_T0('ODE.I')= 0.5;
-    weights_Iref_map_T0('SPT.I')= 0.5;
-    CPDFactory_Iref = ...
-        CPDFactory('Gaussian_CPD', 'Reference.I', 0, ...
-        {'mean', 0.0, 'cov', 5.0}, ...
-        weights_Iref_map_T0, ...
-        weights_Iref_map_T1);
-    add_CPD_factories(meta_dbn_factory, {CPDFactory_Iref}, false);
-
-    [meta_dbn, ~, ~, nodes_map] = create_dbn(meta_dbn_factory);
-    
-end

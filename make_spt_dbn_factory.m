@@ -1,24 +1,24 @@
 % Make a DBN for the spatiotemporal BD model with the following variables
 %
 % Time-dependent variables
-%  -> G(t)  ->  G(t+1) ->
-%  -> I(t)  ->  I(t+1) ->
+%  -> SPT.G(t)  ->  SPT.G(t+1) ->
+%  -> SPT.I(t)  ->  SPT.I(t+1) ->
 %
 % Reference variables
-% Gref(t), Gref(t+1)
-% Iref(t), Iref(t+1)
+% SPT.Gref(t), SPT.Gref(t+1)
+% SPT.Iref(t), SPT.Iref(t+1)
 %
 % Observed variables
-% Gobs(t), Gobs(t+1)
-% Iobs(t), Iobs(t+1)
+% SPT.Gobs(t), SPT.Gobs(t+1)
+% SPT.Iobs(t), SPT.Iobs(t+1)
 %
 % Time-invariant variables
-% lambda k Npatch Nisg Rpbc
+% SPT.lambda SPT.k SPT.Npatch SPT.Nisg SPT.Rpbc
 %
 % All variables display gaussian distributions.
 
 % To generate a conditional gaussian model
-function [dbn_factory]= make_spt_dbn_factory()
+function [dbn_factory]= make_spt_dbn_factory(Go, Io, time)
     % Define nodes and intra-slice and inter-slice edges between them 
     node_names=  { 'SPT.lambda', 'SPT.k', 'SPT.Npatch' ,'SPT.Nisg', 'SPT.Rpbc', 'SPT.G', 'SPT.I', 'SPT.Gref', 'SPT.Gobs','Reference.I', 'SPT.Iobs'};
     % Intra - in one time slice
@@ -45,8 +45,9 @@ function [dbn_factory]= make_spt_dbn_factory()
     % - cts parents : Y|X=x ~ N(mu + W x, Sigma)
     % - discrete parents: Y|Q=i ~ N(mu(:,i), Sigma(:,:,i))
     % - cts and discrete parents: Y|X=x,Q=i ~ N(mu(:,i) + W(:,:,i) * x, Sigma(:,:,i))
-    % Create gaussian CPDs for alpha, beta, and h, all with no parents.
-    % elcass1
+    
+    % elcass1 (time-slice 0 or all parents are in the same time slice)
+    
     CPDFactories= {};
     CPDFactories{end+1} = ...
         CPDFactory('Gaussian_CPD', 'SPT.lambda', 0, ...
@@ -65,43 +66,49 @@ function [dbn_factory]= make_spt_dbn_factory()
         {'mean', 4, 'cov', 0.1});
     CPDFactories{end+1} = ...         
         CPDFactory('Gaussian_CPD', 'SPT.G', 0, ...
-        {'mean', 0.0, 'cov', 2});
+        {'mean', Go(1), 'cov', 0.00001, 'clamp_mean', 1, 'clamp_cov', 1, 'clamp_weights', 1});
     CPDFactories{end+1} = ...         
         CPDFactory('Gaussian_CPD', 'SPT.Gref', 0, ...
-        {'mean', 0.0, 'cov', 2,'weights', 1});
+        {'mean', Go(1), 'cov', 0.00001,'weights', 1}); % E= [1.0*G(t)] 
     CPDFactories{end+1} = ...         
         CPDFactory('Gaussian_CPD', 'SPT.Gobs', 0, ...
-        {'mean', 0.0, 'cov', 2, 'weights', 1});
+        {'mean', Go(1), 'cov', 0.00001, 'weights', 1}); % E= [1.0*Gref(t)]
     CPDFactories{end+1} = ...         
         CPDFactory('Gaussian_CPD', 'SPT.I', 0, ...
-        {'mean', 0.0, 'cov', 5, 'weights', zeros(1,4)});
+        {'mean', Io(1), 'cov', 5.0, 'weights', zeros(1,4)});
     CPDFactories{end+1} = ...         
         CPDFactory('Gaussian_CPD', 'Reference.I', 0, ...
-        {'mean', 0.0, 'cov', 5, 'weights', 1});
+        {'mean', Io(1), 'cov', 5.0, 'weights', 1}); % E= [1.0*I(t)] 
     CPDFactories{end+1} = ...         
         CPDFactory('Gaussian_CPD', 'SPT.Iobs', 0, ...
-        {'mean', 0.0, 'cov', 5, 'weights', 1});
+        {'mean', Io(1), 'cov', 5.0, 'weights', 1}); % E= [1.0*Iref(t)] 
   
-    %eclass2
+    % eclass2 (time-slice t+1 with parents in the previous time slice)
+    
+    % CPD for G(t+1)
+    
     CPDFactories{end+1} = ...         
         CPDFactory('Gaussian_CPD', 'SPT.G', 1, ...
-        {'mean', 0.0, 'cov', 2, 'weights', 1.0});
+        {'mean', Go(time), 'cov', 2, 'weights', 1.0});
     
     % CPD for I(t+1), assume for now all parents are continuous
-    % TODO: fix the structure of this similarly to ODE
+    % TODO: The following simplified structure will need to be updated according to the SPT model.
+    % I(t+1) := Normal dist. E = weightA * I(t) + weightB * G(t) + weightC
+    % * k + weightD * Npatch + weightE  * Nisg + weightF  * Rpbc
+    
     weights_I1_map_T0= containers.Map(); % parents in slice t
     weights_I1_map_T1= containers.Map(); % parents in slice t+1
-    weights_I1_map_T0('SPT.G')= 0.05;
-    weights_I1_map_T0('SPT.I')= 0.6;
-    weights_I1_map_T1('SPT.k')= 0.6;
-    weights_I1_map_T1('SPT.Npatch')= 0.6;
-    weights_I1_map_T1('SPT.Nisg')= 0.6;
-    weights_I1_map_T1('SPT.Rpbc')= 0.05;
+    weights_I1_map_T0('SPT.I')= 0.6; % weightA
+    weights_I1_map_T0('SPT.G')= 0.05; % weightB
+    weights_I1_map_T1('SPT.k')= 1; % weightC
+    weights_I1_map_T1('SPT.Npatch')= 0; % weightD
+    weights_I1_map_T1('SPT.Nisg')= 0; % weightE
+    weights_I1_map_T1('SPT.Rpbc')= 0; % weightF
     CPDFactories{end+1} = ...         
         CPDFactory('Gaussian_CPD', 'SPT.I', 1, ...
-        {'mean', 0.0, 'cov', 5}, ...
+        {'mean', Io(time), 'cov', 5.0}, ...
         weights_I1_map_T0, weights_I1_map_T1);
-    %CPDFactories{13} = ...         CPDFactory('Gaussian_CPD', 'I')+n, 'mean', 70, 'cov', 5);
+    
     dbn_factory= DBNFactory( ...
         node_names, edges_intra, edges_inter, ...
         eclass1_map, eclass2_map, CPDFactories);
