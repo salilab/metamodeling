@@ -16,7 +16,7 @@ Io1 = sptm1(:,3); % Iexp in measurement number 1, vector along time
 
 % parameter learning
 npers= bnet.nnodes_per_slice;
-T = 400; % lengthhs of sequences to explore
+T = 4000; % lengthhs of sequences to explore
 disp(npers);
 % Sample from the posterior:
 %disp(length(bnet.intra))
@@ -37,7 +37,7 @@ nodes_order= cell2mat(values(nodes_map));
 
 % Plot the distribution of ODE.beta
 disp('plot');
-fprintf("Sampled time-series of length %d", T);
+fprintf("Sampled time-series of length %d\n", T);
 y = sample_seq(nodes_map('ODE.h'),:);
 nbins = 10;
 
@@ -48,14 +48,15 @@ area = sum(hts) * (ctrs(2)-ctrs(1));
 xx = linspace(4,8);
 hold on; 
 plot(xx,area*normpdf(xx,mean(y),std(y)),'k-','LineWidth',2);
-fprintf("Normal probability density function of ODE.h");
+fprintf("Normal probability density function of ODE.h\n");
 disp(mean(y));
+disp(std(y)/sqrt(length(y)));
 disp(std(y));
 %f = ksdensity(y,xx);
 %plot(xx,area*f,'g-')
 legend('ODE.h, posterior');
 hold off;
-time =3
+time =3;
 function [meta_dbn, nodes_map]=make_meta_bnet(Gm, Im, Go, Io, time)
 
     % make ODE and BD models
