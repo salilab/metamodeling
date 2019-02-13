@@ -55,7 +55,7 @@ nodes_order= cell2mat(values(nodes_map));
 
 % Plot the distribution of SPT.beta
 disp('plot');
-fprintf("Sampled time-series of length %d", T);
+fprintf("Sampled time-series of length %d\n", T);
 y = sample_seq(nodes_map('SPT.k'),:);
 nbins = 10;
 
@@ -66,8 +66,9 @@ area = sum(hts) * (ctrs(2)-ctrs(1));
 xx = linspace(5,15);
 hold on; 
 plot(xx,area*normpdf(xx,mean(y),std(y)),'k-','LineWidth',2);
-fprintf("Normal probability density function of SPT.k");
+fprintf("Normal probability density function of SPT.k:\n");
 disp(mean(y));
+disp(std(y)/sqrt(length(y)));
 disp(std(y));
 %f = ksdensity(y,xx);
 %plot(xx,area*f,'g-')
