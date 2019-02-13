@@ -18,31 +18,29 @@ bnet = mk_bnet(dag, ns, 'discrete', dnodes);
 
 % - no parents: Y ~ N(mu, Sigma)
 % - cts parents : Y|X=x ~ N(mu + W x, Sigma)
-bnet.CPD{1} = gaussian_CPD(bnet, 1, 'mean', 3, 'cov', 0.3);
-bnet.CPD{2} = gaussian_CPD(bnet, 2, 'mean', 1, 'cov', 0.1,  'weights', 0.8);
+bnet.CPD{1} = gaussian_CPD(bnet, 1, 'mean', 3.0, 'cov', 0.3);
+bnet.CPD{2} = gaussian_CPD(bnet, 2, 'mean', 1.0, 'cov', 0.1,  'weights', 0.8); % E(x2)= 1.0 + 0.8*x1
 
-% compute the unconditional marginals
+fprintf('Test 1: unconditional marginals')
 engine = jtree_inf_engine(bnet);
 evidence = cell(1,n);
 [engine, ll] = enter_evidence(engine, evidence);
 marg = marginal_nodes(engine, 2);
 
-tol = 1e-2; % tolerance
+tol = 1e-3; % tolerance
 % evaluates EXPRESSION and, if it is false, displays the error message 'Assertion Failed'
-marg.mu
-marg.Sigma
-%assert(approxeq(marg.mu, 4, tol)); % marg.mu equals to 4 +- tol
-%assert(approxeq(sqrt(marg.Sigma), 0.63, tol)); % marg.Sigma equals to 4 +- tol
+marg
+assert(approxeq(marg.mu, 3.4, tol)); 
+assert(approxeq(marg.Sigma, 0.3*0.8^2 + 0.1, tol)); 
 
-% test 2
-T = 100;
-evidence = cell(n,T);
+fprintf('Test 2: conditional probability of x2 given x1=1.0')
+evidence = cell(1, n);
 evidence{1} = 1; % industrial
 [engine, ll] = enter_evidence(engine, evidence);
 
 marg = marginal_nodes(engine, 2);
-marg.T;
-marg.mu;
+marg
 
-%assert(approxeq(marg.mu, 11, tol));
-%assert(approxeq(sqrt(marg.Sigma), 0.32, tol));
+
+assert(approxeq(marg.mu, 1.8, tol));
+assert(approxeq(marg.Sigma, 0.1, tol));
