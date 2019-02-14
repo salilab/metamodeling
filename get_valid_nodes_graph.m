@@ -35,5 +35,5 @@ function [intra, inter, nodes_map, reverse_nodes_map]= get_valid_nodes_graph(nod
     intra= intra(order, order);
     inter= inter(order, order);
     nodes_map= containers.Map(node_names(order), 1:n);
-    reverse_nodes_map= get_reverse_nodes_map(nodes_map)
+    reverse_nodes_map= get_reverse_nodes_map(nodes_map);
 end
