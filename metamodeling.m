@@ -16,7 +16,7 @@ Io1 = sptm1(:,3); % Iexp in measurement number 1, vector along time
 
 % parameter learning
 npers= bnet.nnodes_per_slice;
-T = 4000; % lengthhs of sequences to explore
+T = 400; % lengthhs of sequences to explore
 disp(npers);
 % Sample from the posterior:
 %disp(length(bnet.intra))
@@ -26,6 +26,17 @@ disp(npers);
 %sample_seq=  cell2mat(sample_dbn(bnet, 'length', T,'evidence', evidence));
 sample_seq=  cell2mat(sample_dbn(bnet, 'length', T));
 nodes_order= cell2mat(values(nodes_map));
+
+% I.
+T = 2
+engine = jtree_dbn_inf_engine(bnet); 
+evidence= cell(npers, T);
+evidence{nodes_map('SPT.k'), 1} = 10; 
+marg= marginal_nodes(enter_evidence(engine, evidence), ...
+                     nodes_map('ODE.h'), ...
+                     2);
+fprintf("Posterior probability distribution of ODE.h(time =2) given SPT.k(time=1)== 100is:\n"); 
+disp(marg.T)
 
 % Plot ODE.G and ODE.I
 %figure()
@@ -37,7 +48,7 @@ nodes_order= cell2mat(values(nodes_map));
 
 % Plot the distribution of ODE.beta
 disp('plot');
-fprintf("Sampled time-series of length %d\n", T);
+fprintf("Sampled time-series of length %d", T);
 y = sample_seq(nodes_map('ODE.h'),:);
 nbins = 10;
 
@@ -48,15 +59,14 @@ area = sum(hts) * (ctrs(2)-ctrs(1));
 xx = linspace(4,8);
 hold on; 
 plot(xx,area*normpdf(xx,mean(y),std(y)),'k-','LineWidth',2);
-fprintf("Normal probability density function of ODE.h\n");
+fprintf("Normal probability density function of ODE.h");
 disp(mean(y));
-disp(std(y)/sqrt(length(y)));
 disp(std(y));
 %f = ksdensity(y,xx);
 %plot(xx,area*f,'g-')
 legend('ODE.h, posterior');
 hold off;
-time =3;
+time =3
 function [meta_dbn, nodes_map]=make_meta_bnet(Gm, Im, Go, Io, time)
 
     % make ODE and BD models
