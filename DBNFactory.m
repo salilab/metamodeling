@@ -83,7 +83,6 @@ classdef DBNFactory < matlab.mixin.Copyable
             CPD_factories= values(obj.CPD_factories_map);
             for i=1:numel(CPD_factories)
                 CPD_factory= CPD_factories{i};
-                disp(CPD_factory);
                 [~,dbn]=create_and_associate_cpd(CPD_factory, dbn, nodes_map);
             end
         end % function 
