@@ -20,22 +20,23 @@
 % TODO: check the time step of the equation, and see the G and I.
 %%
 % Read in the experimental measurements
-SPTm1 = importdata('SPT_obs1_avr.dat');
+SPTm1 = importdata('ode_exp1_avr.dat');
 Gm1 = SPTm1(:,2); % Gexp in measurement number 1, vector along time
 Im1 = SPTm1(:,3); % Iexp in measurement number 1, vector along time
 disp(Gm1(1));
 
-n = 9;
+%n = 11;
 
 % TODO: To implement model along time
-time = 3
-[dbn_factory]= make_spt_dbn_factory(Gm1, Im1, time);
+time = 1
+[spt_dbn_factory]= make_spt_dbn_factory(Gm1, Im1, time);
+[dbn, ~, ~, nodes_map] = create_dbn(spt_dbn_factory);
 % parameter learning
 
 % parameter learning
-npers= bnet.nnodes_per_slice;
+npers= dbn.nnodes_per_slice;
 T = 400; % lengthhs of sequences to explore
-disp(npers);
+%disp(npers);
 
 %Sample from the posterior:
 %disp(length(bnet.intra))
@@ -43,7 +44,7 @@ disp(npers);
 %evidence=cell(n,T);
 %evidence{2,1}=1;
 %sample_seq=  cell2mat(sample_dbn(bnet, 'length', T,'evidence', evidence));
-sample_seq=  cell2mat(sample_dbn(bnet, 'length', T));
+sample_seq=  cell2mat(sample_dbn(dbn, 'length', T));
 nodes_order= cell2mat(values(nodes_map));
 %%
 % Plot SPT.G and SPT.I
@@ -75,33 +76,46 @@ disp(std(y));
 legend('SPT.k, prior');
 hold off;
 %%
-% compute the unconditional marginals
-engine = jtree_inf_engine(bnet);
-T = 2;
+%compute the unconditional marginals of h(20)
+dbn_engine = jtree_dbn_inf_engine(dbn);
+T = 400;
 evidence= cell(npers, T);
-[engine, ll] = enter_evidence(engine, evidence); % ll is the log marginal likelihood
-marg = marginal_nodes(engine, nodes_map('SPT.k'));
+[dbn_engine, ll] = enter_evidence(dbn_engine, evidence); % ll is the log marginal likelihood
+marg = marginal_nodes(dbn_engine, nodes_map('SPT.k'),10);
 
-tol = 1e-2; % tolerance
+tol = 1; % tolerance
 % evaluates EXPRESSION and, if it is false, displays the error message 'Assertion Failed'
-marg.mu
-marg.Sigma
-assert(approxeq(marg.mu, 10, tol)); % marg.mu equals to 4 +- tol
-assert(approxeq(sqrt(marg.Sigma), 1, tol)); % marg.Sigma equals to 4 +- tol
-%%
-% compute the posteror marginals with evidence
-T = 10;
-evidence= cell(npers, T);
-evidence{nodes_map('SPT.I')} = 100; 
-marg= marginal_nodes(enter_evidence(engine, evidence), ...
-                     nodes_map('SPT.k'));
-fprintf("Posterior probability distribution of Igiven G==2 is:\n"); 
+fprintf("Unconditional probability distribution of k(10) is:\n"); 
+fprintf("%f +- %f", marg.mu, sqrt(marg.Sigma)) % mean +- stddev
 
-% evaluates EXPRESSION and, if it is false, displays the error message 'Assertion Failed'
-tol = 1e-2; % tolerance
-marg.mu % mean of the marginal
-marg.Sigma % variance of the marginal
-assert(approxeq(marg.mu, 10, tol)); % marg.mu equals to 4 +- tol
-assert(approxeq(sqrt(marg.Sigma), 1, tol)); % marg.Sigma equals to 4 +- tol
+%assert(approxeq(marg.mu, 6.1, tol)); % marg.mu equals to 4 +- tol
+%assert(approxeq(marg.Sigma, 3.0, tol)); % marg.Sigma equals to 4 +- tol
 
+%Posterior marginal of h(20) given Iexp
+T = 400;
+evidence{nodes_map('E.Ipm'),2} = 25.0; 
+i=10
+disp(i)
+marg= marginal_nodes(enter_evidence(dbn_engine, evidence), ...
+                     nodes_map('SPT.k')+npers, ...
+                     i);
+fprintf("Posterior probability distribution of h(10) given Iexp(10) is:\n"); 
+fprintf("%f sigma %f +- %f", marg.mu, marg.Sigma, sqrt(marg.Sigma)) % mean +- stddev
+xx = linspace(7,9);
+plot(xx,area*normpdf(xx,marg.mu,marg.Sigma),'k-','LineWidth',2);
+
+%compute other posteror marginals with evidence
+%T = 400;
+%n=nodes_map.Count;
+%evidence= cell(npers, T);
+%evidence{nodes_map('SPT.Ipm'),10} = 1.0; 
+%evidence{nodes_map('SPT.k'),10} = 70.0; 
+
+%i=12
+%disp(i)
+%marg= marginal_nodes(enter_evidence(dbn_engine, evidence), ...
+%                     nodes_map('SPT.k')+npers, ...
+%                     i);
+%fprintf("Posterior probability distribution of k is:\n"); 
+%fprintf("%f +- %f", marg.mu, sqrt(marg.Sigma)) % mean +- stddev
 
