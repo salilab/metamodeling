@@ -65,7 +65,7 @@ nbins = 10;
 h = bar(ctrs,hts,'hist');
 set(h,'FaceColor',[0.8 0.8 0.8],'EdgeColor',[0 0 0]);
 area = sum(hts) * (ctrs(2)-ctrs(1));
-xx = linspace(5,15);
+xx = linspace(8,12,200);
 hold on; 
 plot(xx,area*normpdf(xx,mean(y),std(y)),'k-','LineWidth',2);
 fprintf("Normal probability density function of SPT.k");
@@ -101,8 +101,9 @@ marg= marginal_nodes(enter_evidence(dbn_engine, evidence), ...
                      i);
 fprintf("Posterior probability distribution of h(10) given Iexp(10) is:\n"); 
 fprintf("%f sigma %f +- %f", marg.mu, marg.Sigma, sqrt(marg.Sigma)) % mean +- stddev
-xx = linspace(7,9);
+xx = linspace(8,12,200);
 plot(xx,area*normpdf(xx,marg.mu,marg.Sigma),'k-','LineWidth',2);
+legend('SPT.k, posterior');
 
 %compute other posteror marginals with evidence
 %T = 400;
