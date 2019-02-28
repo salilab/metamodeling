@@ -24,9 +24,11 @@ Gm1 = odem1(:,2); % Gexp in measurement number 1, vector along time
 Im1 = odem1(:,3); % Iexp in measurement number 1, vector along time
 disp(Gm1(1));
 
-for time  = 1:length(Gm1)
-    [bnet, nodes_map, intra, inter]= make_ode_bnet(Gm1, Im1,time);
-end
+%for time  = 1:length(Gm1)
+%    [bnet, nodes_map, intra, inter]= make_ode_bnet(Gm1, Im1,time);
+%end
+
+[bnet, nodes_map, intra, inter]= make_ode_bnet(Gm1, Im1,3);
 n = 9;
 
 % parameter learning
@@ -137,11 +139,11 @@ function [bnet, nodes_map, intra, inter]= make_ode_bnet(Gm, Im, time)
     bnet.CPD{2} = gaussian_CPD(bnet, nodes_map('ODE.beta'),   'mean', 0.11, 'cov', 0.002);
     bnet.CPD{3} = gaussian_CPD(bnet, nodes_map('ODE.h'),   'mean', 6.1, 'cov', 0.1);
     bnet.CPD{4} = gaussian_CPD(bnet, nodes_map('ODE.G'),   'mean', Gm(1), 'cov', 0.1);
-    bnet.CPD{5} = gaussian_CPD(bnet, nodes_map('ODE.Gref'),   'mean', Gm(1), 'cov', 0.1,'weights', 1);
-    bnet.CPD{6} = gaussian_CPD(bnet, nodes_map('ODE.Gexp'), 'mean', Gm(1), 'cov', 0.1, 'weights', 1);
+    bnet.CPD{5} = gaussian_CPD(bnet, nodes_map('ODE.Gref'),   'mean', Gm(1), 'cov', 0.1,'weights', 0.5);
+    bnet.CPD{6} = gaussian_CPD(bnet, nodes_map('ODE.Gexp'), 'mean', Gm(1), 'cov', 0.1, 'weights', 0.5);
     bnet.CPD{7} = gaussian_CPD(bnet, nodes_map('ODE.I'),   'mean', Im(1), 'cov', 5);
-    bnet.CPD{8} = gaussian_CPD(bnet, nodes_map('Reference.I'),   'mean', Im(1), 'cov', 5, 'weights', 1);
-    bnet.CPD{9} = gaussian_CPD(bnet, nodes_map('ODE.Iexp'), 'mean', Im(1), 'cov', 5, 'weights', 1);
+    bnet.CPD{8} = gaussian_CPD(bnet, nodes_map('Reference.I'),   'mean', Im(1), 'cov', 5, 'weights', 0.5);
+    bnet.CPD{9} = gaussian_CPD(bnet, nodes_map('ODE.Iexp'), 'mean', Im(1), 'cov', 5, 'weights', 0.5);
     
     % eclass2
     bnet.CPD{10} = gaussian_CPD(bnet, nodes_map('ODE.G')+n, 'mean', Gm(time), 'cov', 0.1,  'weights', 0.5);

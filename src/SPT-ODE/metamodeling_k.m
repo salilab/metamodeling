@@ -53,13 +53,13 @@ marg= marginal_nodes(enter_evidence(dbn_engine, evidence), ...
 fprintf("%f sigma %f +- %f", marg.mu, marg.Sigma, sqrt(marg.Sigma)) % mean +- stddev
 
 % plot k
-xx = linspace(8,11);
+xx = linspace(8,12 );
 
 % create some plot with a legend
 hAx(1) = axes();
 hLine(1) = plot(xx,normpdf(xx,spt_marg.mu,spt_marg.Sigma),'k-','LineWidth',2, 'Parent',hAx(1));
 set(hAx(1), 'Box','off');
-legend(hLine(1), {'SPT.k, '},'Location','NorthWest');
+legend(hLine(1), {'SPT.k, posterior'},'Location','NorthWest');
 
 % copy the axis
 hAx(2) = copyobj(hAx(1),gcf);
@@ -67,7 +67,7 @@ delete(get(hAx(2),'Children'));            %# delete its children
 hLine(2) = plot(xx,normpdf(xx,marg.mu,marg.Sigma),'r-','LineWidth',2,'Parent',hAx(2));
 set(hAx(2), 'Color','none', 'XTick',[], ...
     'YAxisLocation','right', 'Box','off');   %# make it transparent
-legend(hLine(2), {'SPT.k, posterior'}, 'Color','w');
+legend(hLine(2), {'Meta.k, posterior'}, 'Color','w');
 
 % test different measurement
 sptk = {};

@@ -59,7 +59,7 @@ xx = linspace(4,8);
 hAx(1) = axes();
 hLine(1) = plot(xx,normpdf(xx,ode_marg.mu,ode_marg.Sigma),'k-','LineWidth',2, 'Parent',hAx(1));
 set(hAx(1), 'Box','off');
-legend(hLine(1), {'ODE.h, '},'Location','NorthWest');
+legend(hLine(1), {'ODE.h, posterior'},'Location','NorthWest');
 
 % copy the axis
 hAx(2) = copyobj(hAx(1),gcf);
@@ -67,7 +67,7 @@ delete(get(hAx(2),'Children'));            %# delete its children
 hLine(2) = plot(xx,normpdf(xx,marg.mu,marg.Sigma),'r-','LineWidth',2,'Parent',hAx(2));
 set(hAx(2), 'Color','none', 'XTick',[], ...
     'YAxisLocation','right', 'Box','off');   %# make it transparent
-legend(hLine(2), {'ODE.h, posterior'}, 'Color','w');
+legend(hLine(2), {'Meta.h, posterior'}, 'Color','w');
 
 % test different measurement
 odeh = {};
