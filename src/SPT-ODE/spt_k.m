@@ -74,6 +74,7 @@ disp(std(y));
 %f = ksdensity(y,xx);
 %plot(xx,area*f,'g-')
 legend('SPT.k, prior');
+figure;
 hold off;
 %%
 %compute the unconditional marginals of h(20)
