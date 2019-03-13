@@ -1,6 +1,6 @@
 % Make a meta-modeling DBN for the ODE and SPT model
 warning('off','MATLAB:singularMatrix');
-
+warning('off','MATLAB:nearlySingularMatrix');
 %Read in the experimental measurements
 clear;
 % Read in the experimental measurements
@@ -43,17 +43,18 @@ disp(spt_npers);
 spt_marg= marginal_nodes(enter_evidence(spt_dbn_engine, spt_evidence), ...
                      spt_nodes_map('SPT.k')+spt_npers, ...
                      i);
-fprintf("%f sigma %f +- %f", spt_marg.mu, spt_marg.Sigma, sqrt(spt_marg.Sigma)) % mean +- stddev
+        
+fprintf("%f sigma %f +- %f\n", spt_marg.mu, spt_marg.Sigma, sqrt(spt_marg.Sigma)) % mean +- stddev
  
 evidence= cell(npers, T);
-evidence{nodes_map('E.Ipm'),2} = 25.0; 
+evidence{nodes_map('E.Ipm'),2} = 10.0; 
 marg= marginal_nodes(enter_evidence(dbn_engine, evidence), ...
                      nodes_map('SPT.k')+npers, ...
                      i);
-fprintf("%f sigma %f +- %f", marg.mu, marg.Sigma, sqrt(marg.Sigma)) % mean +- stddev
+fprintf("%f sigma %f +- %f\n", marg.mu, marg.Sigma, sqrt(marg.Sigma)) % mean +- stddev
 
 % plot k
-xx = linspace(8,12 );
+xx = linspace(-50,12 );
 
 % create some plot with a legend
 hAx(1) = axes();
@@ -74,23 +75,23 @@ sptk = {};
 metak= {};
 for measure = 1:50  
     
-spt_evidence= cell(spt_npers, T);
-spt_evidence{spt_nodes_map('E.Ipm'),2} = I1(measure); 
-i=10;
-disp(i);
-disp(spt_npers);
-spt_marg= marginal_nodes(enter_evidence(spt_dbn_engine, spt_evidence), ...
-                     spt_nodes_map('SPT.k')+spt_npers, ...
-                     i);
-fprintf("%f sigma %f +- %f", spt_marg.mu, spt_marg.Sigma, sqrt(marg.Sigma)) % mean +- stddev
-sptk(end+1,:) = {spt_marg.mu, sqrt(spt_marg.Sigma)};
-evidence= cell(npers, T);
-evidence{nodes_map('E.Ipm'),2} = I1(measure); 
-marg= marginal_nodes(enter_evidence(dbn_engine, evidence), ...
-                     nodes_map('SPT.k')+npers, ...
-                     i);
-fprintf("%f sigma %f +- %f", marg.mu, marg.Sigma, sqrt(marg.Sigma)) % mean +- stddev
-metak(end+1,:) = {marg.mu, sqrt(marg.Sigma)};
+    spt_evidence= cell(spt_npers, T);
+    spt_evidence{spt_nodes_map('E.Ipm'),2} = I1(measure); 
+    i=10;
+    disp(i);
+    disp(spt_npers);
+    spt_marg= marginal_nodes(enter_evidence(spt_dbn_engine, spt_evidence), ...
+                         spt_nodes_map('SPT.k')+spt_npers, ...
+                         i);
+    fprintf("%f sigma %f +- %f\n", spt_marg.mu, spt_marg.Sigma, sqrt(marg.Sigma)) % mean +- stddev
+    sptk(end+1,:) = {spt_marg.mu, sqrt(spt_marg.Sigma)};
+    evidence= cell(npers, T);
+    evidence{nodes_map('E.Ipm'),2} = I1(measure); 
+    marg= marginal_nodes(enter_evidence(dbn_engine, evidence), ...
+                         nodes_map('SPT.k')+npers, ...
+                         i);
+    fprintf("%f sigma %f +- %f\n", marg.mu, marg.Sigma, sqrt(marg.Sigma)) % mean +- stddev
+    metak(end+1,:) = {marg.mu, sqrt(marg.Sigma)};
 end
 
 % Create a table with the data and variable names
