@@ -69,6 +69,12 @@ set(hAx(2), 'Color','none', 'XTick',[], ...
     'YAxisLocation','right', 'Box','off');   %# make it transparent
 legend(hLine(2), {'Meta.h, posterior'}, 'Color','w');
 
+% Create a table with the data and variable names
+yy=normpdf(xx,marg.mu,marg.Sigma)/sum(normpdf(xx,marg.mu,marg.Sigma))
+variable = [xx(:) yy(:)];
+size(variable);
+dlmwrite('h_meta.txt',variable);
+
 % test different measurement
 odeh = {};
 metah= {};

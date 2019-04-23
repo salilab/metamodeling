@@ -24,7 +24,7 @@ clear;
 odem1 = importdata('ode_exp1_avr.dat');
 Gm1 = odem1(:,2); % Gexp in measurement number 1, vector along time
 Im1 = odem1(:,3); % Iexp in measurement number 1, vector along time
-disp(Gm1(1));
+%disp(Gm1(1));
 
 % TODO: To implement model along time
 time = 1
@@ -43,34 +43,47 @@ T = 400; % lengthhs of sequences to explore
 sample_seq=  cell2mat(sample_dbn(dbn, 'length', T));
 nodes_order= cell2mat(values(nodes_map));
 
-%Plot ODE.h distribution
-%figure()
-%yyaxis left;
-%plot(1:T, sample_seq(nodes_map('ODE.G'),:));
-%yyaxis right;
-%plot(1:T, sample_seq(nodes_map('ODE.I'),:));
-%legend('ODE.G','ODE.I');  
+% Plot ODE.G and ODE.I
 
-% Plot the distribution of ODE.beta
+figure()
+yyaxis left;
+plot(1:T, sample_seq(nodes_map('ODE.Gpm'),:));
+yyaxis right;
+plot(1:T, sample_seq(nodes_map('ODE.Ipm'),:));
+legend('ODE.Gpm','ODE.Ipm');  
+
+
+%Plot ODE.h distribution
 disp('plot');
 fprintf("Sampled time-series of length %d", T);
 y = sample_seq(nodes_map('ODE.h'),:);
 nbins = 10;
 
 [hts,ctrs] = hist(y, nbins);
-h = bar(ctrs,hts,'hist');
-set(h,'FaceColor',[0.8 0.8 0.8],'EdgeColor',[0 0 0]);
+%h = bar(ctrs,hts,'hist');
+%set(h,'FaceColor',[0.8 0.8 0.8],'EdgeColor',[0 0 0]);
 area = sum(hts) * (ctrs(2)-ctrs(1));
-xx = linspace(4,8);
+xx = linspace(2,10);
 hold on; 
-plot(xx,area*normpdf(xx,mean(y),std(y)),'k-','LineWidth',2);
+plot(xx,area*normpdf(xx,mean(y),std(y))/T,'k-','LineWidth',2);
 fprintf("Normal probability density function of ODE.h");
 disp(mean(y));
 disp(std(y));
 %f = ksdensity(y,xx);
 %plot(xx,area*f,'g-')
-legend('ODE.h, prior');
+set(gca,'linewidth', 2,'fontsize',24,'fontname','Times New Roman') % Sets the width of the axis lines, font size, font
+gca.XAxis.MinorTick = 'on';
+gca.XAxis.MinorTickValues = xx(1):.5:xx(2);
+legend('Meal.h, prior');
+legend('boxoff');
 hold off;
+
+% Create a table with the data and variable names
+%yy=area*normpdf(xx,mean(y),std(y))/sum(area*normpdf(xx,mean(y),std(y)))
+%variable = [xx(:) yy(:)];
+%size(variable);
+%dlmwrite('h_prior.txt',variable);
+%type 'h_prior.txt'
 
 %compute the unconditional marginals of h(20)
 disp(npers)
@@ -105,6 +118,14 @@ fprintf("Posterior probability distribution of h(10) given Iexp(10) is:\n");
 fprintf("%f sigma %f +- %f", marg.mu, marg.Sigma, sqrt(marg.Sigma)) % mean +- stddev
 xx = linspace(4,8);
 plot(xx,area*normpdf(xx,marg.mu,marg.Sigma),'k-','LineWidth',2);
+
+
+% Create a table with the data and variable names
+yy=normpdf(xx,marg.mu,marg.Sigma)/sum(normpdf(xx,marg.mu,marg.Sigma))
+variable = [xx(:) yy(:)];
+size(variable);
+dlmwrite('h_posterior.txt',variable);
+
 %assert(approxeq(marg.mu, 6.1, tol)); % marg.mu equals to 4 +- tol
 %assert(approxeq(sqrt(marg.Sigma), 0.1, tol)); % marg.Sigma equals to 4 +- tol
 
