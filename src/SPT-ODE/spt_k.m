@@ -46,6 +46,16 @@ T = 400; % lengthhs of sequences to explore
 %sample_seq=  cell2mat(sample_dbn(bnet, 'length', T,'evidence', evidence));
 sample_seq=  cell2mat(sample_dbn(dbn, 'length', T));
 nodes_order= cell2mat(values(nodes_map));
+
+
+% Plot ODE.G and ODE.I
+
+figure()
+yyaxis left;
+plot(1:T, sample_seq(nodes_map('SPT.Gisg'),:));
+yyaxis right;
+plot(1:T, sample_seq(nodes_map('SPT.Ipm'),:));
+legend('SPT.Gisg','SPT.Ipm');  
 %%
 % Plot SPT.G and SPT.I
 %figure()
@@ -65,7 +75,7 @@ nbins = 10;
 h = bar(ctrs,hts,'hist');
 set(h,'FaceColor',[0.8 0.8 0.8],'EdgeColor',[0 0 0]);
 area = sum(hts) * (ctrs(2)-ctrs(1));
-xx = linspace(8,12,200);
+xx = linspace(8,12,100);
 hold on; 
 plot(xx,area*normpdf(xx,mean(y),std(y)),'k-','LineWidth',2);
 fprintf("Normal probability density function of SPT.k");
@@ -74,8 +84,14 @@ disp(std(y));
 %f = ksdensity(y,xx);
 %plot(xx,area*f,'g-')
 legend('SPT.k, prior');
-figure;
 hold off;
+% Create a table with the data and variable names
+
+yy=area*normpdf(xx,mean(y),std(y))/sum(area*normpdf(xx,mean(y),std(y)))
+variable = [xx(:) yy(:)];
+size(variable);
+dlmwrite('k_prior.txt',variable);
+
 %%
 %compute the unconditional marginals of h(20)
 dbn_engine = jtree_dbn_inf_engine(dbn);
@@ -102,9 +118,15 @@ marg= marginal_nodes(enter_evidence(dbn_engine, evidence), ...
                      i);
 fprintf("Posterior probability distribution of h(10) given Iexp(10) is:\n"); 
 fprintf("%f sigma %f +- %f", marg.mu, marg.Sigma, sqrt(marg.Sigma)) % mean +- stddev
-xx = linspace(8,12,200);
+xx = linspace(8,12,100);
 plot(xx,area*normpdf(xx,marg.mu,marg.Sigma),'k-','LineWidth',2);
 legend('SPT.k, posterior');
+
+% Create a table with the data and variable names
+yy=normpdf(xx,marg.mu,marg.Sigma)/sum(normpdf(xx,marg.mu,marg.Sigma))
+variable = [xx(:) yy(:)];
+size(variable);
+dlmwrite('k_posterior.txt',variable);
 
 %compute other posteror marginals with evidence
 %T = 400;

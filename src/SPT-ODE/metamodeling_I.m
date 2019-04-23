@@ -35,6 +35,16 @@ T = 400;
 
 %Posterior marginal of h(20) given Iexp
 
+% Plot ODE.G and ODE.I
+sample_seq=  cell2mat(sample_dbn(dbn, 'length', T));
+nodes_order= cell2mat(values(nodes_map));
+figure()
+yyaxis left;
+plot(1:T, sample_seq(nodes_map('E.Gpm'),:));
+yyaxis right;
+plot(1:T, sample_seq(nodes_map('E.Ipm'),:));
+legend('E.Gpm','E.Ipm');  
+
 spt_evidence= cell(spt_npers, T);
 spt_evidence{spt_nodes_map('E.Ipm'),2} = 55.0; 
 i=10;
@@ -73,7 +83,7 @@ legend(hLine(2), {'Meta.k, posterior'}, 'Color','w');
 yy=normpdf(xx,marg.mu,marg.Sigma)/sum(normpdf(xx,marg.mu,marg.Sigma))
 variable = [xx(:) yy(:)];
 size(variable);
-dlmwrite('k_meta.txt',variable);
+dlmwrite('I_meta.txt',variable);
 
 % test different measurement
 sptk = {};
@@ -102,4 +112,4 @@ end
 % Create a table with the data and variable names
 T = table(sptk, metak )
 % Write data to text file
-writetable(T, 'k.txt')
+writetable(T, 'I.txt')
