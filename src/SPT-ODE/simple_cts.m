@@ -19,7 +19,7 @@ bnet = mk_bnet(dag, ns, 'discrete', dnodes);
 % - no parents: Y ~ N(mu, Sigma)
 % - cts parents : Y|X=x ~ N(mu + W x, Sigma)
 bnet.CPD{1} = gaussian_CPD(bnet, 1, 'mean', 3, 'cov', 0.3);
-bnet.CPD{2} = gaussian_CPD(bnet, 2, 'mean', 1, 'cov', 0.1,  'weights', 1);
+bnet.CPD{2} = gaussian_CPD(bnet, 2, 'mean', 2, 'cov', 0.1,  'weights', 1);
 
 disp(bnet.CPD{1})
 CPD = struct(bnet.CPD{1}); % Peek inside CPD{1}

@@ -1,26 +1,26 @@
 % Make a DBN for the spatiotemporal BD model with the following variables
 %
 % Time-dependent variables
-%  -> SPT.Gisg(t)  ->  SPT.Gisg(t+1) ->
-%  -> SPT.Ipm(t)  ->  SPT.Ipm(t+1) ->
+%  -> G.SPT(t)  ->  G.SPT(t+1) ->
+%  -> I.SPT(t)  ->  I.SPT(t+1) ->
 %
 % Reference variables
-% R.Gisg(t), R.Gisg(t+1)
-% R.Ipm(t), R.Ipm(t+1)
+% G.ref(t), G.ref(t+1)
+% I.ref(t), I.ref(t+1)
 %
 % Observed variables
-% E.Gisg(t), E.Gisg(t+1)
-% E.Ipm(t), E.Ipm(t+1)
+% G.obs(t), G.obs(t+1)
+% I.obs(t), I.obs(t+1)
 %
 % Time-invariant variables
-% SPT.lambda SPT.k SPT.Npatch SPT.Nisg SPT.Rpbc
+% lambda.SPT k.SPT Npatch.SPT Nisg.SPT Disg.SPT Ninsulin.SPT Rpbc.SPT
 %
 % All variables display gaussian distributions.
 
 % To generate a conditional gaussian model
 function [dbn_factory]= make_spt_dbn_factory(Go, Io, time)
     % Define nodes and intra-slice and inter-slice edges between them 
-    node_names=  { 'SPT.lambda', 'SPT.k', 'SPT.Npatch' ,'SPT.Nisg', 'SPT.Rpbc', 'SPT.Gisg', 'SPT.Ipm', 'R.Gisg', 'E.Gisg','R.Ipm', 'E.Ipm'};
+    node_names=  { 'G.SPT','G.ref','G.obs','lambda.SPT', 'k.SPT', 'Npatch.SPT' ,'Nisg.SPT', 'Disg.SPT', 'Ninsulin.SPT','Rpbc.SPT', 'I.SPT', 'I.ref', 'I.obs'};
     % Intra - in one time slice
     edges_intra= {'SPT.Gisg', 'R.Gisg'; 'R.Gisg', 'E.Gisg'; 'SPT.k', 'SPT.Ipm'; 'SPT.Npatch', 'SPT.Ipm';'SPT.Nisg', 'SPT.Ipm'; 'SPT.Rpbc', 'SPT.Ipm'; 'SPT.Ipm', 'R.Ipm'; 'R.Ipm', 'E.Ipm'};
     % Inter - between time slices
