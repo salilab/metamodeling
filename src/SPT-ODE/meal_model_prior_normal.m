@@ -25,7 +25,7 @@ warning('off','MATLAB:singularMatrix');
 %Read in the experimental measurements
 clear;
 % G_Model, I_Model, alpha_Model,beta_Model, Gb_Model
-[meal_dbn_factory]= make_meal_dbn_factory(92, 25, 0.05, 0.11, 25);
+[meal_dbn_factory]= make_meal_dbn_factory(92, 25, 0.05, 0.11, 92);
 [dbn, ~, ~, nodes_map] = create_dbn(meal_dbn_factory);
 npers= dbn.nnodes_per_slice;
 dbn_engine = jtree_dbn_inf_engine(dbn);
@@ -59,23 +59,44 @@ Experiments = importdata('dataset/meal/meal_exp1_normal.dat');
 Gexp = Experiments(:,2); % Gexp in measurement number 1, vector along time
 Iexp = Experiments(:,3); % Gexp in measurement number 1, vector along time
 % Parameter estimation from submodels and correct overall network topology
-Imeal={}
+G={}
+Gb={}
+G_minus_Gb={}
+I={}
 
-%for measure = 1:198
-%    disp(measure);
-%    evidence= cell(npers, T);
-%    evidence{nodes_map('G.obs'),measure} = Gexp(measure); % evidence at time slice 2
+for measure = 1:198
+    %disp(measure);
+    evidence= cell(npers, T);
+    evidence{nodes_map('G.obs'),measure} = Gexp(measure); % evidence at time slice 2
     %evidence{nodes_map('I.obs'),measure} = Iexp(measure); 
-%    [engine, ll] = enter_evidence(dbn_engine, evidence);
-%    disp(ll);
-%    marg= marginal_nodes(engine, ...
-%                     nodes_map('G.Meal')+npers, ...
-%                     measure+1);
-     % For tabular nodes, we display marg.T(index of node)
-%    fprintf("%f +- %f", marg.mu, sqrt(marg.Sigma)); % mean +- stddev
-%    Imeal(end+1,:) = {marg.mu, sqrt(marg.Sigma)};
-%end
-%disp(Imeal);
+    [engine, ll] = enter_evidence(dbn_engine, evidence);
+    %disp(ll);
+    margG= marginal_nodes(engine,nodes_map('G.Meal')+npers,measure+1);
+    margGb= marginal_nodes(engine,nodes_map('Gb.Meal')+npers,measure+1);
+    margG_minus_Gb= marginal_nodes(engine,nodes_map('G_minus_Gb.Meal')+npers,measure+1);
+    margI= marginal_nodes(engine,nodes_map('I.Meal')+npers,measure+1);
+   
+    %For tabular nodes, we display marg.T(index of node)
+    G(end+1,:) = {margG.mu, sqrt(margG.Sigma)};
+    Gb(end+1,:) = {margGb.mu, sqrt(margGb.Sigma)};
+    G_minus_Gb(end+1,:) = {margG_minus_Gb.mu, sqrt(margG_minus_Gb.Sigma)};
+    I(end+1,:) = {margI.mu, sqrt(margI.Sigma)};
+    %fprintf("%f +- %f", marg.mu, sqrt(marg.Sigma)); % mean +- stddev
+end
+disp(G);
+disp("separate");
+disp(Gb);
+disp("separate");
+disp(G_minus_Gb);
+disp("separate");
+disp(I);
+
+
+% Create a table with the data and variable names
+T = table(G, I);
+% Write data to text file
+writetable(T, 'meal_G-I_normal.txt');
+
 
 %evidence= cell(npers, T);
 %evidence{nodes_map('G.obs'),2} = 90; % evidence at time slice 2
@@ -97,7 +118,6 @@ ncases = 20;
 cases = cell(1, ncases);
 onodes = [nodes_map('G.obs')]; 
 %evidence = cell(1, N);
-%evidence(findings(pos)) = num2cell(repmat(2, 1, length(pos)));
 
 for i=1:ncases
   ev = sample_dbn(dbn, 'length', T);
@@ -114,17 +134,15 @@ disp(ll);
 
 sample_seq=  cell2mat(sample_dbn(dbn2, 'length', T));
 
+CPD = struct(dbn2.CPD{nodes_map('G.Meal')});
+disp(CPD.mean);
+disp(CPD.cov);
+    
 for i=1:T
-    %disp(sample_seq(nodes_map('G.Meal'),i));
-    %disp(sample_seq(nodes_map('I.Meal'),i));
+    disp(sample_seq(nodes_map('G.Meal'),i));
+    disp(sample_seq(nodes_map('I.Meal'),i));
     %fprintf("CPD %d - trained parameters:\n", i);
-    CPD = struct(dbn2.CPD{nodes_map('G.Meal')});
-    disp(CPD.mean);
+    %CPD = struct(dbn2.CPD{nodes_map('G.Meal')});
+    %disp(CPD.mean);
     %disp(CPD.cov);
 end
-
-% Create a table with the data and variable names
-%T = table(Gexp(1:198), Imeal );
-% Write data to text file
-%writetable(T, 'meal_G-I_normal.txt');
-
