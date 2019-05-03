@@ -15,7 +15,7 @@
 % Time-invariant variables
 % alpha beta h 
 %
-
+% The ODE equation is only when G > h
 % TODO: check the time step of the equation, and see the G and I.
 warning('off','MATLAB:singularMatrix');
 
