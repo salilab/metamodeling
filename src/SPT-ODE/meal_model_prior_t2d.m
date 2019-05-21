@@ -20,7 +20,6 @@
 %
 % The ODE equation is only when G > h
 % TODO: check the time step of the equation, and see the G and I.
-% Tricks - DG is 
 warning('off','MATLAB:singularMatrix');
 
 %Read in the experimental measurements
@@ -28,7 +27,7 @@ clear;
 % G_Model, I_Model, alpha_Model,beta_Model, Gb_Model
 %[meal_dbn_factory]= make_meal_dbn_factory_eq1(5.1, 34, 0.05, 39.6, 2, 5.1);
 %G_Model, I_Model, alpha_Model,beta_Model, K_Model, dt_Model, DG_Model, Gb_Model, Sb_Model
-[meal_dbn_factory]= make_meal_dbn_factory_eq2(5.111, 0, 0.05, 39.6,828, 3, 0.056, 5.111, 34);
+[meal_dbn_factory]= make_meal_dbn_factory_eq2(9.167, 0, 0.013, 22.5,445.5, 3, 0.03, 9.167, 102.5);
 [dbn, ~, ~, nodes_map] = create_dbn(meal_dbn_factory);
 npers= dbn.nnodes_per_slice;
 dbn_engine = jtree_dbn_inf_engine(dbn);
@@ -58,15 +57,15 @@ nodes_order= cell2mat(values(nodes_map));
 %fprintf("prior distribution of I.Meal, mean %f, error, %f ", mean(Ivalues), std(Ivalues));
 
 % test different measurement
-Experiment1 = importdata('/Users/lipingsun/research/Meta-modeling/bnt/Meta-modeling2/dataset/meal/140points/meal_exp1_normal2.dat');
+Experiment1 = importdata('/Users/lipingsun/research/Meta-modeling/bnt/Meta-modeling2/dataset/meal/140points/meal_exp1_t2d2.dat');
 Gexp = Experiment1(:,2); % Gexp in measurement number 1, vector along time
-Experiment2 = importdata('/Users/lipingsun/research/Meta-modeling/bnt/Meta-modeling2/dataset/meal/140points/meal_exp1_normal2_DG.dat');
+Experiment2 = importdata('/Users/lipingsun/research/Meta-modeling/bnt/Meta-modeling2/dataset/meal/140points/meal_exp1_t2d2_DG.dat');
 DGexp = Experiment2(:,2); % Gexp in measurement number 1, vector along time
 
 % Parameter estimation from submodels and correct overall network topology
 G={}
+Gb={}
 DG={}
-I={}
 S={}
 
 % testing
@@ -97,29 +96,30 @@ end
 
 for measure = 1:140
     margG= marginal_nodes(engine,nodes_map('G.Meal'),measure);
+    margGb= marginal_nodes(engine,nodes_map('Gb.Meal'),measure);
     margDG= marginal_nodes(engine,nodes_map('DG.Meal'),measure);
-    margI= marginal_nodes(engine,nodes_map('I.Meal'),measure);
     margS= marginal_nodes(engine,nodes_map('S.Meal'),measure);
    
     %For tabular nodes, we display marg.T(index of node)
     G(end+1,:) = {margG.mu, sqrt(margG.Sigma)};
+    Gb(end+1,:) = {margGb.mu, sqrt(margGb.Sigma)};
     DG(end+1,:) = {margDG.mu, sqrt(margDG.Sigma)};
-    I(end+1,:) = {margI.mu, sqrt(margI.Sigma)};
     S(end+1,:) = {margS.mu, sqrt(margS.Sigma)};
     %fprintf("%f +- %f", marg.mu, sqrt(marg.Sigma)); % mean +- stddev
 end
-%disp(G);
+disp(G);
+disp("separate");
+disp(Gb);
 disp("separate");
 disp(DG);
-disp("separate");
-disp(I);
 disp("separate");
 disp(S);
 
 % Create a table with the data and variable names
-T = table(G, S, I);
+T = table(G, S);
 % Write data to text file
-writetable(T, 'meal_G-S_normal.txt');
+writetable(T, 'meal_G-S_t2d.txt');
+
 
 %evidence= cell(npers, T);
 %evidence{nodes_map('G.obs'),2} = 90; % evidence at time slice 2
