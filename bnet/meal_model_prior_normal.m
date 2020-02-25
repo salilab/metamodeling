@@ -21,7 +21,7 @@
 warning('off','MATLAB:singularMatrix');
 
 % Read in the experimental measurements
-Experiment3 = importdata('/Users/lipingsun/SynologyDrive/research/Meta-modeling/bnt/Meta-modelingS_Gmeal/dataset/meal/140points/meal_exp1_normal2_Gin_dt1_sigmoid.dat');
+Experiment3 = importdata('/Users/lipingsun/SynologyDrive/research/Meta-modeling/bnt/Metamodeling-bnet/dataset/meal/140points/meal_exp1_normal2_Gin_dt1_sigmoid.dat');
 DGexp = Experiment3(:,2); % Rate of change in glucose intake, mM
 Gintakeexp = Experiment3(:,3); % Glucose intake, mM
 
