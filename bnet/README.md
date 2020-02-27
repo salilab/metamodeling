@@ -10,22 +10,36 @@ This repository is for developing meta-modeling implementations.
 * merge_dbn_factories.m  
 
 ## DBN factories for (meta-)models:
-* make_meal_dbn_factory_eq.m --- The meal model.
-* make_pancreas_dbn_factory.m --- The pancreas model. 
-* make_network_dbn_factory.m --- The network model  
-* make_spt_dbn_factory.m --- The SPT model. 
-* make_KEGG_dbn_factory.m --- The KEGG model.   
-* make_glp1r_dbn_factory.m --- The GLP1R model. 
-* make_meta_bnet5.m --- The metamodel of meal, network, SPT, KEGG and GP1R models
+* make_meal_dbn_factory_eq.m  
+  --- The meal model.
+* make_pancreas_dbn_factory.m  
+  --- The pancreas model. 
+* make_network_dbn_factory.m  
+  --- The network model  
+* make_spt_dbn_factory.m  
+  --- The SPT model. 
+* make_KEGG_dbn_factory.m  
+  --- The KEGG model.   
+* make_glp1r_dbn_factory.m  
+  --- The GLP1R model. 
+* make_meta_bnet5.m  
+  --- The metamodel of meal, network, SPT, KEGG and GP1R models
 
 ## Running individual model priors and posteriors:
-* meal_model_prior_normal.m --- The meal model for normal subject. 
-* meal_model_prior_t2d.m --- The meal model for T2D subject. 
-* pancreas_model_prior_normal.m --- The pancreas model. 
-* network_model_prior_normal.m --- The network model 
-* spt_model_prior_normal.m --- The SPT model 
-* GLP1R_model_prior_normal.m --- The GLP1R model  
-* KEGG_model_prior_normal.m --- The KEGG model  
+* meal_model_prior_normal.m  
+  --- The meal model for normal subject. 
+* meal_model_prior_t2d.m  
+  --- The meal model for T2D subject. 
+* pancreas_model_prior_normal.m  
+  --- The pancreas model. 
+* network_model_prior_normal.m  
+  --- The network model 
+* spt_model_prior_normal.m  
+  --- The SPT model 
+* GLP1R_model_prior_normal.m  
+  --- The GLP1R model  
+* KEGG_model_prior_normal.m  
+  --- The KEGG model  
 
 ## Running the meta-model priors and posteriors:
 ### Normal subjects
