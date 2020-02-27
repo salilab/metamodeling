@@ -1,0 +1,89 @@
+% Make a DBN for the KEGG model with the following variables
+%
+% Time-dependent variables
+%  -> G(t)  ->  Gin.KEGG(t+1) ->
+%
+% Reference variables
+% Gin.ref(t), Gin.ref(t+1)
+% cAMP.ref(t), cAMP.ref(t+1)
+% S.ref(t), S.ref(t+1)
+%
+% Observed variables
+% Gin.obs(t), Gin.obs(t+1)
+% cAMP.obs(t), cAMP.obs(t+1)
+% S.obs(t), S.obs(t+1)
+%
+% Time-invariant variables
+%
+% Parameters
+%
+% To generate a conditional gaussian model
+function [dbn_factory]= make_KEGG_dbn_factory(Gex_KEGG, GLP1_KEGG, NES_KEGG, Pathway_KEGG, ATP_KEGG);
+    node_names=  {'Gex.KEGG','Gex.ref','Gex.obs','GLP1.KEGG','GLP1.ref','GLP1.obs','Pathway.KEGG','NES.KEGG','ATP.KEGG','ATP.ref','ATP.obs'}; 
+    n= length(node_names);
+    % Intra - in one time slice
+    edges_intra= {'Gex.KEGG','NES.KEGG';'Gex.KEGG','Gex.ref';'Gex.ref','Gex.obs';'GLP1.KEGG','NES.KEGG';...
+       'GLP1.KEGG','GLP1.ref';'GLP1.ref','GLP1.obs';'NES.KEGG','Pathway.KEGG';'Pathway.KEGG',...
+       'ATP.KEGG';'ATP.KEGG','ATP.ref';'ATP.ref','ATP.obs'};
+    % Inter - between time slices
+    edges_inter= {}; 
+    % edges_inter= {'Gex.KEGG', 'Gex.KEGG'; 'NES.KEGG','NES.KEGG';'GLP1.KEGG','GLP1.KEGG';...
+        % 'NES.KEGG','NES.KEGG'}; 
+    eclass1_map= containers.Map();
+    eclass2_map= containers.Map();
+    for i=1:numel(node_names)
+        node_name= node_names{i};
+        cpd_name= [ node_name '.intra' ];
+        eclass1_map(node_name) = cpd_name;
+        eclass2_map(node_name) = cpd_name; % default - to be changed for some special cases
+    end
+    % eclass2_map('Gex.KEGG')= 'Gex.KEGG.inter';
+    % eclass2_map('NES.KEGG')= 'NES.KEGG.inter';
+    % eclass2_map('GLP1.KEGG')= 'GLP1.KEGG.inter';   
+    % eclass2_map('GLP1.KEGG')= 'GLP1.KEGG.inter';   
+    % eclass2_map('NES.KEGG')= 'NES.KEGG.inter';   
+    
+    % elcass1 (time-slice 0 or all parents are in the same time slice)
+    CPDFactories= {};
+    CPDFactories{end+1}=  ...
+        CPDFactory('Gaussian_CPD', 'Gex.KEGG', 0, ...
+        {'mean', Gex_KEGG, 'cov', 1E-12} ); % 
+    CPDFactories{end+1}=  ...
+        CPDFactory('Gaussian_CPD', 'Gex.ref', 0, ...
+        {'mean', 0.0, 'cov', 1E-12, 'weights', 1.0} ); % Gin
+    CPDFactories{end+1}=  ...
+        CPDFactory('Gaussian_CPD', 'Gex.obs', 0, ...
+        {'mean', 0.0, 'cov', 1E-12, 'weights', 1.0} ); % Gin
+    CPDFactories{end+1}=  ...
+        CPDFactory('Gaussian_CPD', 'GLP1.KEGG', 0, ...
+        {'mean', GLP1_KEGG, 'cov', 1E-12} ); % Gin
+    CPDFactories{end+1}=  ...
+        CPDFactory('Gaussian_CPD', 'GLP1.ref', 0, ...
+        {'mean', 0.0, 'cov', 1E-12, 'weights', 1.0} ); % Gin
+    CPDFactories{end+1}=  ...
+        CPDFactory('Gaussian_CPD', 'GLP1.obs', 0, ...
+        {'mean', 0.0, 'cov', 1E-12, 'weights', 1.0} ); % Gin
+    CPDFactories{end+1}=  ...
+        CPDFactory('Gaussian_CPD', 'NES.KEGG', 0, ...
+        {'mean', NES_KEGG, 'cov', 0.001, 'weights', [1.0,1.0]} ); % Gin
+    CPDFactories{end+1}=  ...
+        CPDFactory('Gaussian_CPD', 'Pathway.KEGG', 0, ...
+        {'mean', Pathway_KEGG, 'cov', 1E-12, 'weights', 1.0} ); % Gin
+    CPDFactories{end+1}=  ...
+        CPDFactory('Gaussian_CPD', 'ATP.KEGG', 0, ...
+        {'mean', ATP_KEGG, 'cov', 1E-12, 'weights', 1.0} ); % Gin
+    CPDFactories{end+1}=  ...
+        CPDFactory('Gaussian_CPD', 'ATP.ref', 0, ...
+        {'mean', 0.0, 'cov', 1E-12, 'weights', 1.0} ); % Gin
+    CPDFactories{end+1}=  ...
+        CPDFactory('Gaussian_CPD', 'ATP.obs', 0, ...
+        {'mean', 0.0, 'cov', 1E-12, 'weights', 1.0} ); % Gin
+    % eclass2 (time-slice t+1 with parents in the previous time slice)
+    % CPD for G(t+1)
+    
+    % Final DBN factory
+    dbn_factory= DBNFactory( ...
+        node_names, edges_intra, edges_inter, ...
+        eclass1_map, eclass2_map, CPDFactories);
+  end
+
