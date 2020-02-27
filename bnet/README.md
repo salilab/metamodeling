@@ -29,22 +29,27 @@ This repository is for developing meta-modeling implementations.
 
 ## Running the meta-model priors and posteriors:
 ### Normal subjects
-* metamodeling5_normal_meal.m --- To run the metamodel of a nomal subject after a meal.  
-* metamodeling5_normal_meal_glp1_medium.m ---  To run the metamodel after of a nomal subject a meal, with medium GLP1.   
-* metamodeling5_normal_meal_glp1_high.m --- To run the metamodel of a nomal subject after a meal, with high GLP1.   
+***GLP1 effects on the meal model***
+* metamodeling5_normal_meal.m --- To run the metamodel of a nomal subject after a meal. 
+* metamodeling5_normal_meal_glp1_medium.m ---  To run the metamodel after of a nomal subject a meal, with medium GLP1. 
+* metamodeling5_normal_meal_glp1_high.m --- To run the metamodel of a nomal subject after a meal, with high GLP1. 
 
-* metamodeling5_normal_variables.m --- To run the metamodel of a nomal subject at basal condition (fasting).  
-* metamodeling5_normal_variables_glp1_medium.m --- To run the metamodel of a nomal subject at basal condition (fasting), with medium GLP1.   
-* metamodeling5_normal_variables_glp1_high.m --- To run the metamodel ofa nomal subject at basal condition (fasting), with high GLP1.  
+***GLP1 effects on the model variables under basal condition***
+* metamodeling5_normal_variables.m --- To run the metamodel of a nomal subject at basal condition (fasting). 
+* metamodeling5_normal_variables_glp1_medium.m --- To run the metamodel of a nomal subject at basal condition (fasting), with medium GLP1. 
+* metamodeling5_normal_variables_glp1_high.m --- To run the metamodel ofa nomal subject at basal condition (fasting), with high GLP1. 
 
-* metamodeling5_normal_variables_Gb.m --- To run the metamodel of a nomal subject at basal condition (fasting), with different basal glucoes Gb.   
-* metamodeling5_normal_variables_highGb.m --- To run the metamodel of a nomal subject at basal condition (fasting), with high basal glucoes Gb.   
+***Effects of different basal glucose concentrations on model variables under basal condition***
+* metamodeling5_normal_variables_Gb.m --- To run the metamodel of a nomal subject at basal condition (fasting), with different basal glucoes Gb. 
+* metamodeling5_normal_variables_highGb.m --- To run the metamodel of a nomal subject at basal condition (fasting), with high basal glucoes Gb. 
 
 ### T2D subjects
+***GLP1 effects on the meal model***
 * metamodeling5_t2d_meal.m --- To run the metamodel of a t2d subject after a meal. 
-* metamodeling5_t2d_meal_glp1_medium.m ---  To run the metamodel after of a t2d subject a meal, with medium GLP1.   
-* metamodeling5_t2d_meal_glp1_high.m --- To run the metamodel of a t2d subject after a meal, with high GLP1.   
+* metamodeling5_t2d_meal_glp1_medium.m ---  To run the metamodel after of a t2d subject a meal, with medium GLP1. 
+* metamodeling5_t2d_meal_glp1_high.m --- To run the metamodel of a t2d subject after a meal, with high GLP1. 
 
-* metamodeling5_t2d_variables.m --- To run the metamodel of a t2d subject at basal condition (fasting).  
-* metamodeling5_t2d_variables_glp1_medium.m --- To run the metamodel of a t2d subject at basal condition (fasting), with medium GLP1.   
-* metamodeling5_t2d_variables_glp1_high.m --- To run the metamodel of a t2d subject at basal condition (fasting), with high GLP1.   
+***GLP1 effects on the model variables under basal condition***
+* metamodeling5_t2d_variables.m --- To run the metamodel of a t2d subject at basal condition (fasting). 
+* metamodeling5_t2d_variables_glp1_medium.m --- To run the metamodel of a t2d subject at basal condition (fasting), with medium GLP1. 
+* metamodeling5_t2d_variables_glp1_high.m --- To run the metamodel of a t2d subject at basal condition (fasting), with high GLP1. 
