@@ -15,7 +15,7 @@ This repository is for developing meta-modeling implementations.
 * get_valid_nodes_graph.m   
 * merge_dbn_factories.m  
 
-## To make the dbn factories for (meta-)models:
+## DBN factories for (meta-)models:
 * make_meal_dbn_factory_eq.m --- The meal model. 
 * make_pancreas_dbn_factory.m --- The pancreas model. 
 * make_network_dbn_factory.m --- The network model  
@@ -25,7 +25,7 @@ This repository is for developing meta-modeling implementations.
 
 * make_meta_bnet5.m --- The metamodel of meal, network, SPT, KEGG and GP1R models
 
-## To run individual model priors:
+## Running individual model priors and posteriors:
 * meal_model_prior_normal.m --- The meal model for normal subject. 
 * meal_model_prior_t2d.m --- The meal model for T2D subject. 
 * pancreas_model_prior_normal.m --- The pancreas model. 
@@ -34,7 +34,7 @@ This repository is for developing meta-modeling implementations.
 * GLP1R_model_prior_normal.m --- The GLP1R model  
 * KEGG_model_prior_normal.m --- The KEGG model  
 
-## To run the metamodel:
+## Running the meta-model priors and posteriors:
 **normal subjects**
 * metamodeling5_normal_meal.m --- To run the metamodel of a nomal subject after a meal.  
 * metamodeling5_normal_meal_glp1_medium.m ---  To run the metamodel after of a nomal subject a meal, with medium GLP1.   
