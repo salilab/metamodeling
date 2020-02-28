@@ -32,7 +32,7 @@ Disable line 132 of /Your-Path-To/bnt-master/bnt/learning/learn_params_dbn_em.m
 ## List of files and directories: 
 
 - `dataset`     contains all relevant input data of individual models
-- `bnet`     contains all bnet scripts for meta-mdoeling, please refer to READNE.md in `bnet` for more details
+- `bnet`     contains all bnet scripts for meta-modeling, please refer to READNE.md in `bnet` for more details
 
 ## Information
 
