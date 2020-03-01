@@ -9,7 +9,7 @@ These scripts demonstrate the use of meta-modeling in the modeling of pancreatic
 [https://github.com/bayesnet/bnt](https://github.com/bayesnet/bnt).  
 
 2. Minor bugfix on bnt:  
-Disable line 132 of /Your-Path-To/bnt-master/bnt/learning/learn_params_dbn_em.m
+Disable line 132 of /Your-Path-To/bnt-master/BNT/learning/learn_params_dbn_em.m
 
 ```matlabscript
 125- loglik = 0;
