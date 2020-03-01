@@ -8,8 +8,8 @@ These scripts demonstrate the use of meta-modeling in the modeling of pancreatic
 1. Download bnt here: 
 [https://github.com/bayesnet/bnt](https://github.com/bayesnet/bnt).  
 
-2. Minor bugfix on bnt:  
-Disable line 132 of /Your-Path-To/bnt-master/BNT/learning/learn_params_dbn_em.m
+2. Apply two minor bugfixes on bnt:  
+(a) Disable line 132 of /Your-Path-To/bnt-master/BNT/learning/learn_params_dbn_em.m
 
 ```matlabscript
 125- loglik = 0;
@@ -22,6 +22,14 @@ Disable line 132 of /Your-Path-To/bnt-master/BNT/learning/learn_params_dbn_em.m
 132-   % assert(~isnan(ll))
 133-   loglik = loglik + ll;
 134-   T = size(evidence, 2);
+```
+
+(b) wrap line 85 with the following if statement in /Your-Path-To/bnt-master/BNT/general/mk_bnet.m,
+
+```matlabscript
+85-  if length(mems)>=1
+86-    bnet.rep_of_eclass(e) = mems(1);
+87-  end
 ```
 
 3. Add the path of the bnt package:  
