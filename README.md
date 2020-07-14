@@ -39,8 +39,14 @@ These scripts demonstrate the use of bayesian meta-modeling in the modeling of p
 
 ## List of files and directories: 
 
-- `dataset`     contains all relevant input data of individual models
-- `bnet`     contains all bnet scripts for meta-modeling, please refer to READNE.md in `bnet` for more details
+- `data`     contains the data of individual models including:
+	1-the input values and parameters, stored in .json files
+	2-the observed values for glucose intake after a meal, stored in
+	`DGintake_dt1_sigmoid.dat`
+	3-the input values for different accuracy and precision of
+	variable k_T and G_B 
+- `scripts`     contains all bnet scripts for meta-modeling, please refer to READNE.md in `scripts` for more details
+- `bnt-master`     contains Bayes Net Toolbox for Matlab after bugfixes.
 
 ## Information
 

@@ -1,0 +1,28 @@
+{
+    "name": "GLP1R_prior",
+    "DataInput": {
+	"_comment": "Type of the GLP1 analogues, no unit - analogue 1-10 with increasing affinity to GLP1R",
+	"GLP1a_mean_GLP1R": 0.25,
+	"GLP1a_cov_GLP1R": 1E-6,
+	"_comment": "Compound concentration of the GLP1 analogues , nM - 1-10",
+	"conc_mean_GLP1R": 0.25,
+	"conc_conv_GLP1R": 1E-6,
+	"_comment": "GLP1R activity at the first time slice, no unit",
+	"GLP1R_mean_GLP1R": 1,
+	"GLP1R_cov_GLP1R": 1E-6,
+	"_comment": "Weights between variables in the model ",
+	"GLP1a_w_GLP1R_GLP1R": 2,
+	"conc_w_GLP1R_GLP1R": 2,
+	"_comment": "Minimum covariance in the model",
+	"min_cov_GLP1R": 1E-2, 
+	"_comment": "Time slices to sample",
+	"T": 420 
+    },
+    "EvidenceInput": {
+	"_comment": "evidence",
+        "GLP1a1": 40,
+        "GLP1a2": 60,
+        "GLP1a3": 80
+    },
+    "EvidenceDG": "../data/DGintake_dt1_sigmoid.dat"
+}
