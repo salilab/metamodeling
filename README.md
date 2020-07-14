@@ -32,10 +32,10 @@ These scripts demonstrate the use of bayesian meta-modeling in the modeling of p
 	87-  end
 	```
 
-	- Add the path of the bnt package:  
-	```matlabscript
-	1- addpath(genpathKPM('/Your-Path-To/bnt-master'))
-	```
+- Add the path of the bnt package:  
+```matlabscript
+1- addpath(genpathKPM('/Your-Path-To/bnt-master'))
+```
 
 ## List of files and directories: 
 
