@@ -1,4 +1,4 @@
-These scripts demonstrate the use of meta-modeling in the modeling of pancreatic beta-cells.
+These scripts demonstrate the use of bayesian meta-modeling in the modeling of pancreatic beta-cells.
 ## Prerequisites:
 
 **- matlab:** The scripts are built upon and work with Matlab.  
