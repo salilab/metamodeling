@@ -38,15 +38,15 @@ This repository is for developing Bayesian metamodeling implementations.
 
 ## To run the metamodel for the incretin effects (Fig. 3):
 `metamodel_normal_GLP1.m`  - metamodel of nomal subjects after a meal,
-with GLP1 levels.   
+with different GLP1 concentrations.   
 `metamodel_normal_incretin.m` -metamodel of nomal subjects after a
-meal, with incretin levels.   
+meal, with different incretin concentrations.   
 `metamodel_t2d_GLP1.m`  - metamodel of t2d subjects after a meal,
-with GLP1 levels.   
+with different GLP1 concentrations.   
 `metamodel_t2d_incretin.m` -metamodel of t2d subjects after a meal,
-with incretin levels.   
+with different incretin concentrations.   
 
-##To run the metamodel for the accuracy and precision of model variables (Fig. 4):
+## To run the metamodel for the accuracy and precision of model variables (Fig. 4):
 `metamodel_normal_kt_mean51_cov32_Gb_mean51.m` - an example script for
-the metamodel of a nomal subject to sample output k_t with different
-input values of G_B.   
+the metamodel of a nomal subject to sample output kt with different
+input sigma of Gb.   
