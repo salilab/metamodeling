@@ -41,12 +41,10 @@ This repository is for developing Bayesian metamodeling implementations.
 with GLP1 levels.   
 `metamodel_normal_incretin.m` -metamodel of nomal subjects after a
 meal, with incretin levels.   
-`metamodel_normal_GLP1.m`  - metamodel of t2d subjects after a meal,
+`metamodel_t2d_GLP1.m`  - metamodel of t2d subjects after a meal,
 with GLP1 levels.   
-`metamodel_normal_incretin.m` -metamodel of t2d subjects after a meal,
+`metamodel_t2d_incretin.m` -metamodel of t2d subjects after a meal,
 with incretin levels.   
-`run.py` -python script to run the individual models and the metamodel
-above using matlab python engine.  
 
 ##To run the metamodel for the accuracy and precision of model variables (Fig. 4):
 `metamodel_normal_kt_mean51_cov32_Gb_mean51.m` - an example script for
