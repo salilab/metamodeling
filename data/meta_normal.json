@@ -1,15 +1,18 @@
 {
     "name": "meta_normal",
     "DataInput": {
-	"_comment": "Basal plasma glucose level in the postprandial model, mM",
+	"_comment": "----------Model variables----------",
+	"_comment": "Basal plasma glucose concentration in the postprandial model, mM",
 	"Gb_mean_error": 5.1,  
-	"Gb_cov_error": 1E-4,
-	"_comment": "Force coefficient in the exocytosis model, m/s",
-	"k_mean_error": 10,
-	"k_cov_error": 1E-4,
+	"Gb_cov_error": 1,
+	"_comment": "Force coefficient in the exocytosis model, m s^{-1}",
+	"kt_mean_error": 10,
+	"kt_cov_error": 1,
+
+	"_comment": "----------Parameters for the model inferences----------",
 	"_comment": "Time slices to sample",
 	"T": 100
     },
-    "DataError101": "../data/Gb_k_input_errors101.dat",
-    "DataError21": "../data/Gb_k_input_errors21.dat"
+    "InputErr": "../data/Gb_kt_input_err101.dat",
+    "InputSigma": "../data/Gb_kt_input_sigma101.dat"
 }

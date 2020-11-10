@@ -1,13 +1,16 @@
-% Sample the meta-modeling DBN containing following six input models:
+% Sample the meta-modeling DBN containing following five input models:
 % 1. The postprandial model
-% 2. The pancreas model
-% 3. The exocytosis model
-% 4. The signaling model
+% 2. The exocytosis model
+% 3. The signaling model
+% 4. The GLP1R model
 % 5. The metabolism model
-% 6. The screening model
+
+% Add bnet
+cd ../bnt_master
+addpath(genpathKPM('../bnt_master'))
+cd ../bnet_scripts_Gb-kt
 
 warning('off','MATLAB:singularMatrix');
-
 
 % ---------------------------------
 % Read data as input and evidence
@@ -30,9 +33,61 @@ Json_metabolism = jsondecode(fileread('../data/metabolism.json'));
 % meta model
 Json_meta = jsondecode(fileread('../data/meta_normal.json'));
 Gb_k_input = importdata(Json_meta.InputErr);
+
+% meta model
+Json_meta = jsondecode(fileread('../data/meta_normal.json'));
+Gb_kt_mu_input = importdata(Json_meta.InputErr);
+Gb_kt_sigma_input = importdata(Json_meta.InputSigma);
   
-[dbn, nodes_map]= make_meta_dbn6(Json_postprandial.DataInput.DGd_mean_postprandial, Json_postprandial.DataInput.DGd_cov_postprandial, Json_postprandial.DataInput.Gb_mean_postprandial,...
-                                 Json_postprandial.DataInput.Gb_cov_postprandial, Json_postprandial.DataInput.G_mean_postprandial, Json_postprandial.DataInput.G_cov_postprandial,...
+% Create a table with the data and variable names
+inputGb = {};
+inputGb(end+1,:) = {'Gb_mean_error' 'Gb_cov'};
+inputkt = {};
+inputkt(end+1,:) = {'kt_mean_error' 'kt_cov'};
+outputGb = {};
+outputGb(end+1,:) = {'Gb.postprandial' 'Gb.postprandial' 'Gb.postprandial'};
+outputkt = {};
+outputkt(end+1,:) = {'kt.exocytosis' 'kt.exocytosis' 'kt.exocytosis'};
+
+outputGex = {};
+outputGex(end+1,:) = {'G.postprandial' 'G.postprandial' 'G.postprandial'};
+outputGin = {};
+outputGin(end+1,:) = {'G.exocytosis' 'G.exocytosis' 'G.exocytosis'};
+outputSp = {};
+outputSp(end+1,:) = {'S.postprandial' 'S.postprandial' 'S.postprandial'};
+outputSpa = {};
+outputSpa(end+1,:) = {'Spa.pancreas' 'Spa.pancreas' 'Spa.pancreas'};
+outputSis = {};
+outputSis(end+1,:) = {'Sis.pancreas' 'Sis.pancreas' 'Sis.pancreas'};
+outputScell = {};
+outputScell(end+1,:) = {'Scell.pancreas' 'Scell.pancreas' 'Scell.pancreas'};
+outputSe = {};
+outputSe(end+1,:) = {'S.exocytosis' 'S.exocytosis' 'S.exocytosis'};
+
+disp(length(Gb_kt_mu_input(:,1)));
+
+kt_mean_min_ndx = 51;
+kt_mean_max_ndx = 51;
+kt_cov_min_ndx = 32;
+kt_cov_max_ndx = 32;
+
+Gb_mean_min_ndx = 1;
+Gb_mean_max_ndx = 101;
+Gb_cov_min_ndx = 45;
+Gb_cov_max_ndx = 45;
+
+for i = kt_mean_min_ndx:  kt_mean_max_ndx
+    kt_mean_error = Gb_kt_mu_input(i,2)
+    for j = kt_cov_min_ndx:  kt_cov_max_ndx
+        kt_cov = Gb_kt_sigma_input(j,2)
+        for m = Gb_mean_min_ndx: Gb_mean_max_ndx
+            Gb_mean_error = Gb_kt_mu_input(m,1)
+            for n =Gb_cov_min_ndx: Gb_cov_max_ndx
+                Gb_cov = Gb_kt_sigma_input(n,1)
+                inputGb(end+1,:) = {Gb_mean_error Gb_cov};
+                inputkt(end+1,:) = {kt_mean_error kt_cov};
+                [dbn, nodes_map]= make_meta_dbn6(Json_postprandial.DataInput.DGd_mean_postprandial, Json_postprandial.DataInput.DGd_cov_postprandial, Gb_mean_error,...
+                                 Gb_cov, Json_postprandial.DataInput.G_mean_postprandial, Json_postprandial.DataInput.G_cov_postprandial,...
                                  Json_postprandial.DataInput.DG_mean_postprandial, Json_postprandial.DataInput.DG_cov_postprandial, Json_postprandial.DataInput.Y_mean_postprandial,...
                                  Json_postprandial.DataInput.Y_cov_postprandial, Json_postprandial.DataInput.S_mean_postprandial, Json_postprandial.DataInput.S_cov_postprandial,...
                                  Json_postprandial.DataInput.I_mean_postprandial, Json_postprandial.DataInput.I_cov_postprandial, Json_postprandial.DataInput.Sb_mean_postprandial,...
@@ -43,10 +98,10 @@ Gb_k_input = importdata(Json_meta.InputErr);
                                  Json_pancreas.DataInput.Scell_mean_pancreas, Json_pancreas.DataInput.Scell_cov_pancreas, Json_pancreas.DataInput.Sislet_mean_pancreas, ...
                                  Json_pancreas.DataInput.Sislet_cov_pancreas, Json_pancreas.DataInput.Spancreas_mean_pancreas, Json_pancreas.DataInput.Spancreas_cov_pancreas, ...
                                  Json_pancreas.DataInput.cov_scale_pancreas, Json_pancreas.DataInput.Nc_pancreas, Json_pancreas.DataInput.Ni_pancreas,...
-                                 Json_exocytosis.DataInput.G_mean_exocytosis, Json_exocytosis.DataInput.kt_mean_exocytosis, Json_exocytosis.DataInput.Npatch_mean_exocytosis,...
+                                 Json_exocytosis.DataInput.G_mean_exocytosis, kt_mean_error, Json_exocytosis.DataInput.Npatch_mean_exocytosis,...
                                  Json_exocytosis.DataInput.Nvesicle_mean_exocytosis, Json_exocytosis.DataInput.Ninsulin_mean_exocytosis, Json_exocytosis.DataInput.Rcell_mean_exocytosis,...
                                  Json_exocytosis.DataInput.Dvesicle_mean_exocytosis, Json_exocytosis.DataInput.S_mean_exocytosis, Json_exocytosis.DataInput.G_cov_exocytosis,...
-                                 Json_exocytosis.DataInput.kt_cov_exocytosis, Json_exocytosis.DataInput.Npatch_cov_exocytosis, Json_exocytosis.DataInput.Nvesicle_cov_exocytosis, ...
+                                 kt_cov, Json_exocytosis.DataInput.Npatch_cov_exocytosis, Json_exocytosis.DataInput.Nvesicle_cov_exocytosis, ...
                                  Json_exocytosis.DataInput.Ninsulin_cov_exocytosis, Json_exocytosis.DataInput.Rcell_cov_exocytosis,Json_exocytosis.DataInput.Dvesicle_cov_exocytosis, ...
                                  Json_exocytosis.DataInput.S_cov_exocytosis,...
                                  Json_exocytosis.DataInput.cov_scale_exocytosis,...
@@ -71,47 +126,42 @@ Gb_k_input = importdata(Json_meta.InputErr);
                                  Json_metabolism.DataInput.ATP_cov_metabolism, Json_metabolism.DataInput.cov_scale_metabolism,...
                                  Json_metabolism.DataInput.k1_metabolism, Json_metabolism.DataInput.k2_metabolism,...
                                  Json_metabolism.DataInput.k3_metabolism);
+                
+                npers= dbn.nnodes_per_slice;
+                dbn_engine = jtree_dbn_inf_engine(dbn);
+                
+                % Time slices to sample
+                evidence=cell(npers,Json_meta.DataInput.T);
 
-npers= dbn.nnodes_per_slice;
-dbn_engine = jtree_dbn_inf_engine(dbn);
-
-% Time slices to sample
-for GLP1_evidence = [12.5 Json_signaling.EvidenceInput.GL_GLP1_1 ...
-                     Json_signaling.EvidenceInput.GL_GLP1_2 ...
-                     Json_signaling.EvidenceInput.GL_GLP1_3 Json_signaling.EvidenceInput.GL_GLP1_4]
-    evidence=cell(npers,Json_postprandial.DataInput.T);
-    for measure = 1:Json_postprandial.DataInput.T
-        evidence{nodes_map('DGd.obs'),measure} = EvidenceDG(measure);
-        evidence{nodes_map('GLP1.obs'),measure} = GLP1_evidence; 
-        %evidence{nodes_map('GLP1a.obs'),measure} = 0; 
-        %evidence{nodes_map('conc.obs'),measure} = 0; 
-        %evidence{nodes_map('Gculture.obs'),measure} = 0; 
-        %evidence{nodes_map('Ex4.obs'),measure} = 0;
-    end
-
-    [engine, ll] = enter_evidence(dbn_engine, evidence);
-    %disp(ll);
-    
-    % Create a table with the data and variable names
-    T = table();
-
-    for node_name = ["G.C" "Gcell.C" "Spa.C" "GLP1R.C" ...
-                 "DGd.postprandial" "G.postprandial" "Gb.postprandial" ...
-                 "S.postprandial" "Sb.postprandial" "I.postprandial"  ...
-                 "Spa.pancreas" "Scell.pancreas" "G.exocytosis" ...
-                 "kt.exocytosis" "Npatch.exocytosis" "Nvesicle.exocytosis" ...
-                 "Ninsulin.exocytosis" "S.exocytosis" "G.signaling" ...
-                 "cAMP.signaling" "Ca.signaling" "S.signaling" "GLP1R.signaling"]
-        node_values = {};
-        node_values(end+1,:) = {node_name,node_name,node_name}
-        for slice = 1:Json_postprandial.DataInput.T
-            marg = marginal_nodes(engine,nodes_map(node_name),slice);
-            node_values(end+1,:) = {marg.mu, marg.Sigma, sqrt(marg.Sigma)};
+                [engine, ll] = enter_evidence(dbn_engine, evidence);
+                %disp(ll);
+                marg = marginal_nodes(engine,nodes_map('Gb.postprandial'),Json_meta.DataInput.T);
+                outputGb(end+1,:) = {marg.mu, marg.Sigma, sqrt(marg.Sigma)};
+                marg = marginal_nodes(engine,nodes_map('kt.exocytosis'),Json_meta.DataInput.T);
+                outputkt(end+1,:) = {marg.mu, marg.Sigma, sqrt(marg.Sigma)};
+                
+                marg = marginal_nodes(engine,nodes_map('G.postprandial'),Json_meta.DataInput.T);
+                outputGex(end+1,:) = {marg.mu, marg.Sigma, sqrt(marg.Sigma)};
+                marg = marginal_nodes(engine,nodes_map('G.exocytosis'),Json_meta.DataInput.T);
+                outputGin(end+1,:) = {marg.mu, marg.Sigma, sqrt(marg.Sigma)};
+                
+                marg = marginal_nodes(engine,nodes_map('S.postprandial'),Json_meta.DataInput.T);
+                outputSp(end+1,:) = {marg.mu, marg.Sigma, sqrt(marg.Sigma)};
+                marg = marginal_nodes(engine,nodes_map('Spa.pancreas'),Json_meta.DataInput.T);
+                outputSpa(end+1,:) = {marg.mu, marg.Sigma, sqrt(marg.Sigma)};
+                marg = marginal_nodes(engine,nodes_map('Sis.pancreas'),Json_meta.DataInput.T);
+                outputSis(end+1,:) = {marg.mu, marg.Sigma, sqrt(marg.Sigma)};
+                marg = marginal_nodes(engine,nodes_map('Scell.pancreas'),Json_meta.DataInput.T);
+                outputScell(end+1,:) = {marg.mu, marg.Sigma, sqrt(marg.Sigma)};
+                marg = marginal_nodes(engine,nodes_map('S.exocytosis'),Json_meta.DataInput.T);
+                outputSe(end+1,:) = {marg.mu, marg.Sigma, sqrt(marg.Sigma)};
+            end
         end
-        T = [T node_values];
+        T = table(inputkt,inputGb,outputkt,outputGb,outputGex,outputGin,outputSp,outputSpa,outputSis,outputScell,outputSe);
+        % Write data to text file
+        f1 = sprintf('../results/accuracy_precision/Gb_kt/metamodel_kt_mean_cov%d_Gb_mean_DataError.csv', j);
+        writetable(T, f1)
     end
-
-    % Write data to text file
-    fname = sprintf('../results/GLP1_incretin/metamodel_normal_GLP1_%d.csv', GLP1_evidence);
-    writetable(T, fname);
 end
+
+

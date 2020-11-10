@@ -13,7 +13,7 @@ warning('off','MATLAB:singularMatrix');
 % Read data as input and evidence
 % ---------------------------------
 % postprandial model
-Json_postprandial = jsondecode(fileread('../data/postprandial_normal.json'));
+Json_postprandial = jsondecode(fileread('../data/postprandial_t2d.json'));
 DGexp = importdata(Json_postprandial.EvidenceDG);
 EvidenceDG = DGexp(:,2);
 % pancreas model
@@ -72,46 +72,39 @@ Gb_k_input = importdata(Json_meta.InputErr);
                                  Json_metabolism.DataInput.k1_metabolism, Json_metabolism.DataInput.k2_metabolism,...
                                  Json_metabolism.DataInput.k3_metabolism);
 
+
 npers= dbn.nnodes_per_slice;
 dbn_engine = jtree_dbn_inf_engine(dbn);
 
 % Time slices to sample
-for GLP1_evidence = [12.5 Json_signaling.EvidenceInput.GL_GLP1_1 ...
-                     Json_signaling.EvidenceInput.GL_GLP1_2 ...
-                     Json_signaling.EvidenceInput.GL_GLP1_3 Json_signaling.EvidenceInput.GL_GLP1_4]
-    evidence=cell(npers,Json_postprandial.DataInput.T);
-    for measure = 1:Json_postprandial.DataInput.T
-        evidence{nodes_map('DGd.obs'),measure} = EvidenceDG(measure);
-        evidence{nodes_map('GLP1.obs'),measure} = GLP1_evidence; 
-        %evidence{nodes_map('GLP1a.obs'),measure} = 0; 
-        %evidence{nodes_map('conc.obs'),measure} = 0; 
-        %evidence{nodes_map('Gculture.obs'),measure} = 0; 
-        %evidence{nodes_map('Ex4.obs'),measure} = 0;
-    end
 
-    [engine, ll] = enter_evidence(dbn_engine, evidence);
-    %disp(ll);
-    
-    % Create a table with the data and variable names
-    T = table();
+evidence=cell(npers,Json_postprandial.DataInput.T);
 
-    for node_name = ["G.C" "Gcell.C" "Spa.C" "GLP1R.C" ...
+%for measure = 1:Json_postprandial.DataInput.T
+%    evidence{nodes_map('DGcelltake.ref'),measure} = 0;
+%end
+
+[engine, ll] = enter_evidence(dbn_engine, evidence);
+
+% Create a table with the data and variable names
+T = table();
+
+for node_name = ["G.C" "Gcell.C" "Spa.C" "GLP1R.C" ...
                  "DGd.postprandial" "G.postprandial" "Gb.postprandial" ...
                  "S.postprandial" "Sb.postprandial" "I.postprandial"  ...
                  "Spa.pancreas" "Scell.pancreas" "G.exocytosis" ...
                  "kt.exocytosis" "Npatch.exocytosis" "Nvesicle.exocytosis" ...
                  "Ninsulin.exocytosis" "S.exocytosis" "G.signaling" ...
                  "cAMP.signaling" "Ca.signaling" "S.signaling" "GLP1R.signaling"]
-        node_values = {};
-        node_values(end+1,:) = {node_name,node_name,node_name}
-        for slice = 1:Json_postprandial.DataInput.T
-            marg = marginal_nodes(engine,nodes_map(node_name),slice);
-            node_values(end+1,:) = {marg.mu, marg.Sigma, sqrt(marg.Sigma)};
-        end
-        T = [T node_values];
+    node_values = {};
+    node_values(end+1,:) = {node_name,node_name,node_name}
+    for slice = 1:Json_postprandial.DataInput.T
+        marg = marginal_nodes(engine,nodes_map(node_name),slice);
+        node_values(end+1,:) = {marg.mu, marg.Sigma, sqrt(marg.Sigma)};
     end
-
-    % Write data to text file
-    fname = sprintf('../results/GLP1_incretin/metamodel_normal_GLP1_%d.csv', GLP1_evidence);
-    writetable(T, fname);
+    T = [T node_values];
 end
+
+% Write data to text file
+fname = sprintf('../results/GLP1_incretin/metamodel_t2d.csv');
+writetable(T, fname);

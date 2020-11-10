@@ -2,8 +2,8 @@
 %
 % Time-dependent variables
 %
-% Reference variables
-% Gex.ref, Gin.ref, Scell.ref
+% Coupling variables
+% Gex.C, Gin.C, Scell.C
 %
 % Observed variables
 %
@@ -18,14 +18,14 @@
 % To generate a conditional gaussian model
 function [dbn_factory]= make_pancreas_dbn(Scell_mean_pancreas, Scell_cov_pancreas, Sislet_mean_pancreas, ...
                                           Sislet_cov_pancreas, Spancreas_mean_pancreas, Spancreas_cov_pancreas, ...
-                                          min_cov_pancreas, Scell_w_Sislet_pancreas, Sislet_w_Spancreas_pancreas);
+                                          cov_scale_pancreas, Nc_pancreas, Ni_pancreas);
     
-    node_names=  {'Scell.ref','Scell.pancreas','Sislet.pancreas','Spancreas.pancreas','Spancreas.ref'}; 
+    node_names=  {'Scell.C','Scell.pancreas','Sis.pancreas','Spa.pancreas','Spa.C'}; 
     n= length(node_names);
     
     % Intra - in one time slice
-    edges_intra= {'Scell.ref','Scell.pancreas';'Scell.pancreas','Sislet.pancreas';'Sislet.pancreas','Spancreas.pancreas';...
-                  'Spancreas.pancreas','Spancreas.ref'};
+    edges_intra= {'Scell.C','Scell.pancreas';'Scell.pancreas','Sis.pancreas';'Sis.pancreas','Spa.pancreas';...
+                  'Spa.pancreas','Spa.C'};
     
     % Inter - between time slices
     edges_inter= {}; 
@@ -45,24 +45,24 @@ function [dbn_factory]= make_pancreas_dbn(Scell_mean_pancreas, Scell_cov_pancrea
     % elcass1 (time-slice 0 or all parents are in the same time slice)
     CPDFactories= {};
     CPDFactories{end+1}=  ...
-        CPDFactory('Gaussian_CPD', 'Scell.ref', 0, ...
-        {'mean', Scell_mean_pancreas, 'cov',  Scell_cov_pancreas} ); % Scell.ref
+        CPDFactory('Gaussian_CPD', 'Scell.C', 0, ...
+        {'mean', Scell_mean_pancreas, 'cov',  Scell_cov_pancreas} ); % Scell.C
     
     CPDFactories{end+1}=  ...
         CPDFactory('Gaussian_CPD', 'Scell.pancreas', 0, ...
-        {'mean', 0.0, 'cov', Scell_cov_pancreas*min_cov_pancreas, 'weights', 1.0} ); % Scell = Scell.ref
+        {'mean', 0.0, 'cov', Scell_cov_pancreas*cov_scale_pancreas, 'weights', 1.0} ); % Scell = Scell.C
     
     CPDFactories{end+1}=  ...
-        CPDFactory('Gaussian_CPD', 'Sislet.pancreas', 0, ...
-        {'mean', 0.0, 'cov', Sislet_cov_pancreas*min_cov_pancreas, 'weights', Scell_w_Sislet_pancreas} ); % Sislet = Scell_w_Sislet_pancreas * Scell
+        CPDFactory('Gaussian_CPD', 'Sis.pancreas', 0, ...
+        {'mean', 0.0, 'cov', Sislet_cov_pancreas*cov_scale_pancreas, 'weights', Nc_pancreas} ); % Sislet = Nc_pancreas * Scell
     
     CPDFactories{end+1}=  ...
-        CPDFactory('Gaussian_CPD', 'Spancreas.pancreas', 0, ...
-        {'mean', 0.0, 'cov', Spancreas_cov_pancreas*min_cov_pancreas, 'weights', Sislet_w_Spancreas_pancreas} ); % Spancreas = Sislet_w_Spancreas_pancreas * Sislet
+        CPDFactory('Gaussian_CPD', 'Spa.pancreas', 0, ...
+        {'mean', 0.0, 'cov', Spancreas_cov_pancreas*cov_scale_pancreas, 'weights', Ni_pancreas} ); % Spancreas = Ni_pancreas * Sislet
     
     CPDFactories{end+1}=  ...
-        CPDFactory('Gaussian_CPD', 'Spancreas.ref', 0, ...
-        {'mean', 0.0, 'cov', Spancreas_cov_pancreas*min_cov_pancreas, 'weights', 1.0} ); % Spancreas.ref = Spancreas
+        CPDFactory('Gaussian_CPD', 'Spa.C', 0, ...
+        {'mean', 0.0, 'cov', Spancreas_cov_pancreas*cov_scale_pancreas, 'weights', 1.0} ); % Spancreas.C = Spancreas
     
     % eclass2 (time-slice t+1 with parents in the previous time slice)
 

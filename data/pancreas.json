@@ -1,0 +1,30 @@
+{
+    "name": "pancreas",
+    "DataInput": {
+	"_comment": "----------Model variables----------",
+	"_comment": "Insulin secretion rate of a cell, pM min^{-1}",
+	"Scell_mean_pancreas": 9.32E-09, 
+	"Scell_cov_pancreas": 1E-20,
+	"_comment": "Isulin secretion rate of an islet, pM min^{-1}",
+	"Sislet_mean_pancreas": 1.0625E-05, 
+	"Sislet_cov_pancreas": 1E-12,
+	"_comment": "Insulin secretion rate of a pancreas, pM min^{-1}",
+	"Spancreas_mean_pancreas": 34, 
+	"Spancreas_cov_pancreas": 0.01,
+
+	"_comment": "----------Model parameters----------",
+	"_comment": "Number of beta cells in an islet, -",
+	"Nc_pancreas": 1140,
+	"_comment": "Number of islets in a pancreas, -",
+	"Ni_pancreas": 3.2E+6,
+
+	"_comment": "----------Parameters for the model inferences----------",
+	"_comment": "Scale for the minimum covariance in the model",
+	"cov_scale_pancreas": 1E-2, 
+	"_comment": "Time slices to sample",
+	"T": 420 
+    },
+    "EvidenceInput": {
+	"_comment": "evidence"
+    }
+}

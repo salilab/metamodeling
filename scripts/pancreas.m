@@ -4,11 +4,11 @@
 warning('off','MATLAB:singularMatrix');
 
 % Read data as input and evidence.
-Json_pancreas = jsondecode(fileread('../data/pancreas_prior.json'));
+Json_pancreas = jsondecode(fileread('../data/pancreas.json'));
 
 [pancreas_dbn_factory]= make_pancreas_dbn(Json_pancreas.DataInput.Scell_mean_pancreas, Json_pancreas.DataInput.Scell_cov_pancreas, Json_pancreas.DataInput.Sislet_mean_pancreas, ...
                                           Json_pancreas.DataInput.Sislet_cov_pancreas, Json_pancreas.DataInput.Spancreas_mean_pancreas, Json_pancreas.DataInput.Spancreas_cov_pancreas, ...
-                                          Json_pancreas.DataInput.min_cov_pancreas, Json_pancreas.DataInput.Scell_w_Sislet_pancreas, Json_pancreas.DataInput.Sislet_w_Spancreas_pancreas)
+                                          Json_pancreas.DataInput.cov_scale_pancreas, Json_pancreas.DataInput.Nc_pancreas, Json_pancreas.DataInput.Ni_pancreas)
 
 [dbn, intra, inter, nodes_map] = create_dbn(pancreas_dbn_factory);
 npers= dbn.nnodes_per_slice;
@@ -42,4 +42,4 @@ for node_ndx = 1:npers
 end 
 
 % Write data to text file
-writetable(T, '../results/pancreas_prior_normal.csv');
+writetable(T, '../results/models/pancreas.csv');

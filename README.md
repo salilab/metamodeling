@@ -1,4 +1,11 @@
-These scripts demonstrate the use of bayesian meta-modeling in the modeling of pancreatic beta-cells.
+These scripts demonstrate the use of bayesian metamodeling of complex biological systems across varying representations.
+
+Authors: Liping Sun, Barak Raveh
+
+License:
+
+Publications:
+
 ## Prerequisites:
 
 - **matlab:** The scripts are built upon and work with Matlab.  
@@ -39,15 +46,11 @@ These scripts demonstrate the use of bayesian meta-modeling in the modeling of p
 
 ## List of files and directories: 
 
-- `data`     contains the data of individual models including:  
-	- .json files with the input values and parameters of model variables   
-	- DGintake_dt1_sigmoid.dat with the observed values for glucose intake after a meal  
-	- Gb_k_input_errors21.dat  with the input values for different accuracy and precision of model
-	variables k_T and G_B  
-- `scripts`     contains all bnet scripts for meta-modeling, please refer to READNE.md in `scripts` for more details
-- `bnt-master`     contains Bayes Net Toolbox for Matlab after bugfixes.
-
-## Information
-
-_Author(s)_: Barak Raveh, Liping Sun, Tanmoy Sanyal, Kate White, Jeremy Tempkin, etc.
-
+- `data` contains the data of six input models and the metamodel including:  
+	- JSON files with the values of model parameters and variables:   
+	- `GI.dat` with the observed values for the glucose intake after a meal  
+	- `Gb_kt_input_err101.dat` and `Gb_kt_input_sigma101.dat`  with the input values for different accuracy and precision of model
+	variables G_B and kt
+	- `072919-INS1e-30min-Enrichment-analysis-cleaned-summary.xlsx` with the data for the metabolism model
+- `scripts`     contains all the bnet scripts for metamodeling, please refer to READNE.md in `scripts` for more details
+- `bnt-master`     contains Bayes Net Toolbox for Matlab with the bugfixes.
