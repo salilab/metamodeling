@@ -5,10 +5,15 @@
 % 4. The GLP1R model
 % 5. The metabolism model
 
+SCRIPTS_PATH=pwd(); % Change this line if not running from scripts path
+OUTPUT_PATH= SCRIPTS_PATH+"/Output/accuracy_precision/Gb_kt/";
+if ~exist(OUTPUT_PATH, 'dir')
+    mkdir(OUTPUT_PATH)
+end
 % Add bnet
 cd ../bnt_master
 addpath(genpathKPM('../bnt_master'))
-cd ../bnet_scripts_Gb-kt
+cd(SCRIPTS_PATH) %../bnet_scripts_Gb-kt
 
 warning('off','MATLAB:singularMatrix');
 
@@ -36,7 +41,7 @@ Gb_k_input = importdata(Json_meta.InputErr);
 
 % meta model
 Json_meta = jsondecode(fileread('../data/meta_normal.json'));
-Gb_kt_mu_input = importdata(Json_meta.InputErr);
+Gb_kt_mu_input = importdata(Json_meta.InputErr); % an nx2 array with possible values of Gb and kt to scan
 Gb_kt_sigma_input = importdata(Json_meta.InputSigma);
   
 % Create a table with the data and variable names
@@ -66,7 +71,7 @@ outputSe(end+1,:) = {'S.exocytosis' 'S.exocytosis' 'S.exocytosis'};
 
 disp(length(Gb_kt_mu_input(:,1)));
 
-kt_mean_min_ndx = 51;
+kt_mean_min_ndx = 51; % minimal 
 kt_mean_max_ndx = 51;
 kt_cov_min_ndx = 32;
 kt_cov_max_ndx = 32;
@@ -159,7 +164,7 @@ for i = kt_mean_min_ndx:  kt_mean_max_ndx
         end
         T = table(inputkt,inputGb,outputkt,outputGb,outputGex,outputGin,outputSp,outputSpa,outputSis,outputScell,outputSe);
         % Write data to text file
-        f1 = sprintf('../results/accuracy_precision/Gb_kt/metamodel_kt_mean%d_cov%d_Gb_mean%d_DataError.csv', i,j,m);
+        f1 = sprintf(OUTPUT_PATH+ 'metamodel_kt_mean%d_cov%d_Gb_mean%d_DataError.csv', i,j,m);
         writetable(T, f1)
     end
 end
