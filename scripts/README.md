@@ -37,7 +37,7 @@ This repository is for developing Bayesian metamodeling implementations.
 `metabolism_prior.m`   
 
 ## To run the metamodel for the incretin effects (Fig. 3):
-`metamodel_normal_GLP1.m`  - metamodel of nomal subjects after a meal,
+`metamodel_normal_GLP1.m`  - metamodel of normal subjects after a meal,
 with different GLP1 concentrations.   
 `metamodel_normal_incretin.m` -metamodel of nomal subjects after a
 meal, with different incretin concentrations.   

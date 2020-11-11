@@ -12,10 +12,11 @@ Publications:
 - **bnt:** Bayes Net Toolbox for Matlab.
 
 ## To get started:
-- Download bnt here: 
+- Either use the bnt version here (under bnt_master/), or download a recent version
+  of bnt here: 
 [https://github.com/bayesnet/bnt](https://github.com/bayesnet/bnt).  
 
-- Apply two minor bugfixes on bnt:  
+- If downloaded, apply two minor bugfixes on bnt:  
 	- Disable line 132 of /Your-Path-To/bnt-master/BNT/learning/learn_params_dbn_em.m. 
 
 	```matlabscript
@@ -52,5 +53,5 @@ Publications:
 	- `Gb_kt_input_err101.dat` and `Gb_kt_input_sigma101.dat`  with the input values for different accuracy and precision of model
 	variables G_B and kt
 	- `072919-INS1e-30min-Enrichment-analysis-cleaned-summary.xlsx` with the data for the metabolism model
-- `scripts`     contains all the bnet scripts for metamodeling, please refer to READNE.md in `scripts` for more details
-- `bnt-master`     contains Bayes Net Toolbox for Matlab with the bugfixes.
+- `scripts`     contains all the bnet scripts for metamodeling, please refer to README.md in `scripts` for more details
+- `bnt_master`     contains Bayes Net Toolbox for Matlab with the bugfixes.

@@ -13,6 +13,8 @@
 	"_comment": "Time slices to sample",
 	"T": 100
     },
-    "InputErr": "../data/Gb_kt_input_err101.dat",
+    "_comment": "----------Tables with input systematic error values to scan for Gb and kt in each respective column ----------",
+     "InputErr": "../data/Gb_kt_input_err101.dat",
+    "_comment": "----------Tables with input random error (sigma) values to scan for Gb and kt in each respective column ----------",
     "InputSigma": "../data/Gb_kt_input_sigma101.dat"
 }
