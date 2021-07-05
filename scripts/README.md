@@ -28,13 +28,13 @@ This repository is for developing Bayesian metamodeling implementations.
 `make_meta_dbn6.m`  
 
 ## To run the model priors:
-`postprandial_prior_normal.m`  
-`postprandial_prior_t2d.m`   
-`pancreas_prior.m`   
-`network_prior.m`   
-`spt_prior.m`  
-`screening_prior.m`  
-`metabolism_prior.m`   
+`postprandial_normal.m`  
+`postprandial_t2d.m`   
+`pancreas.m`   
+`signaling.m`   
+`exocytosis.m`  
+`screening.m`  
+`metabolism.m`   
 
 ## To run the metamodel for the incretin effects (Fig. 3):
 `metamodel_normal_GLP1.m`  - metamodel of normal subjects after a meal,
