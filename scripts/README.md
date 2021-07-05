@@ -47,6 +47,6 @@ with different GLP1 concentrations.
 with different incretin concentrations.   
 
 ## To run the metamodel for the accuracy and precision of model variables (Fig. 4):
-`metamodel_normal_kt_mean51_cov32_Gb_mean51.m` - an example script for
+`metamodel_normal_kt_mean51_cov32_Gb_mean1.m` - an example script for
 the metamodel of a nomal subject to sample output kt with different
 input sigma of Gb.   
