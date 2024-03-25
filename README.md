@@ -1,57 +1,12 @@
-These scripts demonstrate the use of bayesian metamodeling of complex biological systems across varying representations.
+## Optimizing Bayesian metamodeling of complex biological systems through analytical insights into uncertainty propagation
 
-Authors: Liping Sun, Barak Raveh
+### Summary
+Bayesian metamodeling divides and conquers this task by integrating a collection of input models. It proceeds through three stages: (i) convert input models into probabilistic surrogate models; (ii) couple surrogate models; and (iii) update surrogate models and input models via backpropagation. Comprehensive understanding and quantitative assessment of uncertainty in Bayesian metamodeling are crucial for its proper interpretation, although challenging due to its inherent high-complexity. We analyze the propagation of uncertainty across metamodeling stages using both an analytical example of two Gaussian time-independent input models and a numerical example of three time-dependent input models describing glucose-stimulated insulin secretion in pancreatic $\beta$-cells. We elucidate criteria in the selection of surrogate models and coupling strategies, as well as identification and resolution of potential conflicts among the input models. The optimized metamodel demonstrates better alignment with experimental data compared to the non-optimized one. 
 
-License:
+### List of files
+- ``metamodel`` contains the scripts for the construction of a glucose-stimulated-insulin-secretion (GSIS) metamodel with three input models, using the BNET package in MATLAB by Kevin Murphy \href{http:// github.com/bayesnet/bnt}. 
+- ``analysis`` contains the scripts for metamodel analysis and plots for the figures in main text.
 
-Publications:
 
-## Prerequisites:
-
-- **matlab:** The scripts are built upon and work with Matlab.  
-- **bnt:** Bayes Net Toolbox for Matlab.
-
-## To get started:
-- Either use the bnt version here (under bnt_master/), or download a recent version
-  of bnt here: 
-[https://github.com/bayesnet/bnt](https://github.com/bayesnet/bnt).  
-
-- If downloaded, apply two minor bugfixes on bnt:  
-	- Disable line 132 of /Your-Path-To/bnt-master/BNT/learning/learn_params_dbn_em.m. 
-
-	```matlabscript
-	125- loglik = 0;
-	126- for l=1:length(cases)
-	127-   evidence = cases{l};
-	128-   if ~iscell(evidence)
-	129-     error('training data must be a cell array of cell arrays')
-	130-   end
-	131-   [engine, ll] = enter_evidence(engine, evidence);
-	132-   % assert(~isnan(ll))
-	133-   loglik = loglik + ll;
-	134-   T = size(evidence, 2);
-	```
-
-	- Wrap line 85 with the following if statement in /Your-Path-To/bnt-master/BNT/general/mk_bnet.m. 
-
-	```matlabscript
-	85-  if length(mems)>=1
-	86-    bnet.rep_of_eclass(e) = mems(1);
-	87-  end
-	```
-
-- Add the path of the bnt package:  
-```matlabscript
-1- addpath(genpathKPM('/Your-Path-To/bnt-master'))
-```
-
-## List of files and directories: 
-
-- `data` contains the data of six input models and the metamodel including:  
-	- JSON files with the values of model parameters and variables:   
-	- `GI.dat` with the observed values for the glucose intake after a meal  
-	- `Gb_kt_input_err101.dat` and `Gb_kt_input_sigma101.dat`  with the input values for different accuracy and precision of model
-	variables G_B and kt
-	- `072919-INS1e-30min-Enrichment-analysis-cleaned-summary.xlsx` with the data for the metabolism model
-- `scripts`     contains all the bnet scripts for metamodeling, please refer to README.md in `scripts` for more details
-- `bnt_master`     contains Bayes Net Toolbox for Matlab with the bugfixes.
+### Information
+Author: Chenxi Wang

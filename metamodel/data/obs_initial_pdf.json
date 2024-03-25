@@ -1,0 +1,14 @@
+{
+	"_comment": "S_pa_obs",
+	"S_pa_obs_mean": 34.0, 
+	"S_pa_obs_cov": 0.0050,
+	"_comment": "S_cell_obs",
+	"S_cell_obs_mean": 9.32E-09, 
+	"S_cell_obs_cov": 1E-20,
+	"_comment": "G_pl_obs",
+	"G_pl_obs_mean": 5.1, 
+	"G_pl_obs_cov": 0.0050,
+	"_comment": "G_cell_obs",
+	"G_cell_obs_mean": 2.5499, 
+	"G_cell_obs_cov": 0.0020
+}

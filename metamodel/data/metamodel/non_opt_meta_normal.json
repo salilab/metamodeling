@@ -1,0 +1,33 @@
+{
+    "name": "meta_normal",
+    "DataInput": {
+	"_comment": "----------Model variables----------",
+	"_comment": "Basal plasma glucose concentration in the postprandial model, mM",
+	"Gb_mean_error": 5.1,  
+	"Gb_cov_error": 1,
+	"_comment": "Force coefficient in the exocytosis model, m s^{-1}",
+	"kt_mean_error": 10,
+	"kt_cov_error": 10,
+
+	"_comment": "S_pa_obs",
+	"S_pa_obs_mean": 34.0, 
+	"S_pa_obs_cov": 1e-10,
+	"_comment": "S_cell_obs",
+	"S_cell_obs_mean": 9.32E-09, 
+	"S_cell_obs_cov": 1e-30, 
+	"_comment": "G_cell_obs",
+	"G_cell_obs_mean": 2.55, 
+	"G_cell_obs_cov": 1e-10,
+	"_comment": "G_pl_obs",
+	"G_pl_obs_mean": 5.1, 
+	"G_pl_obs_cov": 1e-10,
+
+	"_comment": "----------Parameters for the model inferences----------",
+	"_comment": "Time slices to sample",
+	"T": 420
+    },
+    "_comment": "----------Tables with input systematic error values to scan for Gb and kt in each respective column ----------",
+     "InputErr": "../data/Gb_kt_input_err101.dat",
+    "_comment": "----------Tables with input random error (sigma) values to scan for Gb and kt in each respective column ----------",
+    "InputSigma": "../data/Gb_kt_input_sigma101.dat"
+}
