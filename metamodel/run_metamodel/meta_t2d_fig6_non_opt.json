@@ -1,0 +1,62 @@
+{
+    "name": "meta_normal",
+    "DataInput": {
+	"_comment": "----------Model variables----------",
+	"_comment": "Basal plasma glucose concentration in the postprandial model, mM",
+	"Gb_mean_error": 9.2,  
+	"Gb_cov_error": 1,
+	"_comment": "Force coefficient in the exocytosis model, m s^{-1}",
+	"kt_mean_error": 10,
+	"kt_cov_error": 10,
+
+	"_comment": "edge weights in fig3",
+	"S_ve_weight": 0.6, 
+	"S_cell_obs_weight": 0.4, 
+	"G_pr_weight": 0.5, 
+	"G_obs_weight": 0.5,
+	"G_c_weight": 0.4,
+	"G_cell_obs_weight": 0.2, 
+	"S_pa_weight": 0.1,
+	"S_pa_obs_weight": 0.9,
+
+
+	"_comment": "S_pa_obs",
+	"S_pa_obs_mean": 34.0, 
+	"S_pa_obs_cov": 1e-10,
+	"_comment": "S_cell_obs",
+	"S_cell_obs_mean": 9.32E-09, 
+	"S_cell_obs_cov": 1e-30, 
+	"_comment": "G_cell_obs",
+	"G_cell_obs_mean": 4.6, 
+	"G_cell_obs_cov": 1e-10,
+	"_comment": "G_pl_obs",
+	"G_pl_obs_mean": 9.2, 
+	"G_pl_obs_cov": 1e-10,
+
+
+	"_comment": "----------Parameters for the model inferences----------",
+	"_comment": "Time slices to sample",
+	"T": 420
+    },
+
+
+	"G_pl_w": "../data/fig5_G_pl_w.dat",
+	"G_pl_cov": "../data/fig5_G_pl_cov.dat",
+	"S_cell_w": "../data/S_cell_w.dat",
+	"S_cell_cov": "../data/S_cell_cov.dat",
+	"Gcell_C_w": "../data/Gcell_C_w.dat",
+	"Gcell_C_cov": "../data/Gcell_C_cov.dat",
+	
+    "InputErr": "../data/Gpl_obs_DGd.dat",
+    "InputCov": "../data/fig5_G_pl_cov.dat",
+
+    "EvidenceInput": {
+	"_comment": "evidence",
+	"EvidenceDG": "../data/GI.dat",
+    "Evidence_Scell": "../data/Scell_obs_DGd.dat",
+    "Evidence_Spa": "../data/Spa_obs_DGd_avg.dat",
+	"Evidence_Gcell": "../data/Gcell_obs_DGd.dat",
+    "Evidence_Gpl": "../data/Gpl_obs_DGd.dat",
+	"Evidence_Gb_PR": "../data/Gb_PR_obs_DGd.dat"
+	}
+}
