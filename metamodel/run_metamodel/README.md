@@ -17,13 +17,13 @@ The metamodel is implemented using the Dynamic Bayesian Network (DBN) framework 
 #### Figure Generation Scripts
 
 - **fig3_metamodel_normal.m** - Generate Fig. 3 normal state full-time metamodel simulation
-- **fig4_metamodel_normal_test_Gpl.m** - Selection of plasma glucose (Gpl) coupling weights
-- **fig5_metamodel_normal_data_model.m** - Data-model consistency analysis for Fig. 5
-- **fig5_metamodel_normal_full_DGd.m** - Full glucose intake data simulation for Fig. 5
-- **fig6_metamodel_opt.m** - Optimized normal state metamodel
-- **fig6_metamodel_non_opt.m** - Non-optimized normal state metamodel
-- **fig6_metamodel_t2d_opt.m** - Optimized type 2 diabetes (T2D) state metamodel
-- **fig6_metamodel_t2d_non_opt.m** - Non-optimized T2D state metamodel
+- **fig4_metamodel_normal_test_Gpl.m** - Generate Fig. 4: Selection of plasma glucose (Gpl) coupling weights by scanning different means and covariances
+- **fig5_metamodel_normal_data_model.m** - Generate Fig. 5: Data-model consistency analysis with varying input model parameters
+- **fig5_metamodel_normal_full_DGd.m** - Generate data for Fig. 5: Full glucose intake data simulation with different input scales
+- **fig6_metamodel_opt.m** - Generate Fig. 6: Optimized normal state metamodel with updated coupling weights
+- **fig6_metamodel_non_opt.m** - Generate Fig. 6: Non-optimized normal state metamodel for comparison
+- **fig6_metamodel_t2d_opt.m** - Generate Fig. 6: Optimized type 2 diabetes (T2D) state metamodel
+- **fig6_metamodel_t2d_non_opt.m** - Generate Fig. 6: Non-optimized T2D state metamodel for comparison
 
 #### Testing and Validation Scripts
 
@@ -188,4 +188,45 @@ Results are saved in the `../Output/` directory:
 Output CSV files contain the following for all model variables at each time slice:
 - Posterior mean (mu)
 - Posterior covariance (Sigma)
-- Posterior standard deviation (\sqrt(Sigma))
+- Posterior standard deviation (√Sigma)
+
+## Workflow Summary
+
+### Order of Execution
+
+1. **Generate Surrogate Models** (Optional - outputs already provided):
+   ```matlab
+   cd ../surrogatemodel
+   postprandial_normal
+   exocytosis
+   pancreas
+   ```
+
+2. **Generate Metamodel Outputs**:
+   ```matlab
+   cd ../run_metamodel
+   % Add BNT to path first
+   cd ../bnt_master
+   addpath(genpathKPM(pwd))
+   cd ../run_metamodel
+   
+   % Run MATLAB scripts for each figure
+   fig3_metamodel_normal
+   fig4_metamodel_normal_test_Gpl
+   fig5_metamodel_normal_full_DGd
+   fig6_metamodel_opt
+   fig6_metamodel_non_opt
+   fig6_metamodel_t2d_opt
+   fig6_metamodel_t2d_non_opt
+   ```
+
+3. **Generate Figures with Python**:
+   ```bash
+   cd ../../analysis
+   python Fig2.py  # Analyze input models
+   python Fig3.py  # Metamodel full-time evolution
+   python Fig4.py  # Coupling weight selection
+   python Fig5.py  # Data-model consistency
+   python Fig6.py  # Optimized vs non-optimized comparison
+   ```
+
