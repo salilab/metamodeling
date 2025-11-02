@@ -1,4 +1,4 @@
-% Make a DBN for the postprandial model with ENHANCED EDGES (S3 version)
+% Make a DBN for the postprandial model with the following variables
 %
 % Time-dependent variables
 %
@@ -11,7 +11,7 @@
 %
 % Parameters
 %
-% To generate a conditional gaussian model with MORE EDGES than s1 and s2
+% To generate a conditional gaussian model
 
 function [dbn_factory]= make_postprandial_dbn_s3(DGd_mean_postprandial, DGd_cov_postprandial, Gb_mean_postprandial,...
                                               Gb_cov_postprandial, G_mean_postprandial, G_cov_postprandial,...
@@ -21,35 +21,26 @@ function [dbn_factory]= make_postprandial_dbn_s3(DGd_mean_postprandial, DGd_cov_
                                               Sb_cov_postprandial, alpha_postprandial, beta_postprandial,...
                                               gamma_postprandial, k1_postprandial,k2_postprandial,...
                                               k3_postprandial, k4_postprandial, K_postprandial,...
-                                              dt_postprandial, cov_scale_postprandial)
+                                              dt_postprandial, cov_scale_postprandial);
     
     node_names = {'DGd.postprandial','DGd.C','DGd.obs','G.postprandial','G.C',...
                   'Gcell.C','Gb.postprandial','DG.postprandial','Y.postprandial','Spa.C',...
                   'Sb.postprandial','S.postprandial','I.postprandial'}; 
     n= length(node_names);
     
-    % Intra - in one time slice (ENHANCED with MORE EDGES)
-    % Original edges_intra had 10 edges
-    % S3 version adds 5 MORE EDGES for enhanced coupling
+    % Intra - in one time slice
     edges_intra= {'DGd.postprandial','DGd.C';'DGd.C','DGd.obs';'Gb.postprandial','DG.postprandial';...
                   'G.postprandial','DG.postprandial'; 'G.postprandial', 'G.C';'G.C','Gcell.C';...
                   'DGd.postprandial','S.postprandial'; ...
-                  'Y.postprandial','S.postprandial';'Spa.C','S.postprandial';'Sb.postprandial','S.postprandial';...
-                  'G.postprandial','Y.postprandial';'I.postprandial','Y.postprandial';...
-                  'Gb.postprandial','S.postprandial';'I.postprandial','S.postprandial';...
-                  'DG.postprandial','I.postprandial'};
+                  'Y.postprandial','S.postprandial';'Spa.C','S.postprandial';'Sb.postprandial','S.postprandial'};
     
-    % Inter - between time slices (ENHANCED with MORE EDGES)
-    % Original edges_inter had 12 edges
-    % S3 version adds 5 MORE EDGES for enhanced temporal dependencies
+    % Inter - between time slices
     edges_inter= { 'DGd.postprandial','DGd.postprandial';'DGd.postprandial','G.postprandial';'I.postprandial','G.postprandial';...
                    'G.postprandial', 'G.postprandial'; 'Gb.postprandial','Gb.postprandial';...
                    'DG.postprandial','G.postprandial'; 'DG.postprandial','DG.postprandial'; ...
                    'DG.postprandial','Y.postprandial';'Y.postprandial', 'Y.postprandial'; 'S.postprandial','S.postprandial';...
-                   'S.postprandial','I.postprandial';'I.postprandial','I.postprandial'; ...
-                   'S.postprandial','Y.postprandial';'Gb.postprandial','Y.postprandial';...
-                   'I.postprandial','DG.postprandial';'Y.postprandial','G.postprandial';...
-                   'Sb.postprandial','S.postprandial'}; 
+                   'Gb.postprandial', 'G.postprandial';
+                   'S.postprandial','I.postprandial';'I.postprandial','I.postprandial' }; 
     
     % 'Equivalence classes' specify how the template is initiated and rolled
     % Specify which CPD is associates with each node in either time
@@ -68,19 +59,19 @@ function [dbn_factory]= make_postprandial_dbn_s3(DGd_mean_postprandial, DGd_cov_
     eclass2_map('DG.postprandial')= 'DG.postprandial.inter';
     eclass2_map('Y.postprandial')= 'Y.postprandial.inter';   
     eclass2_map('S.postprandial')= 'S.postprandial.inter';   
-    eclass2_map('I.postprandial')= 'I.postprandial.inter';
-    eclass2_map('Sb.postprandial')= 'Sb.postprandial.inter';  
+    eclass2_map('I.postprandial')= 'I.postprandial.inter';  
     
     % elcass1 (time-slice 0 or all parents are in the same time slice)
     % When using clamp, the root node is clamped to the N(0,I) distribution, so that we will not update these parameters during learninG. 
     CPDFactories= {};
-    CPDFactories{end+1}=  ...
-        CPDFactory('Gaussian_CPD', 'DGd.postprandial', 0, ...
-        {'mean', DGd_mean_postprandial,   'cov', DGd_cov_postprandial} ); % DGd
-    
+
     CPDFactories{end+1}=  ...
         CPDFactory('Gaussian_CPD', 'DGd.C', 0, ...
         {'mean', 0.0,   'cov', DGd_cov_postprandial*cov_scale_postprandial, 'weights', 1.0} ); % DGd.C = 1.0 * DGd
+
+    CPDFactories{end+1}=  ...
+        CPDFactory('Gaussian_CPD', 'DGd.postprandial', 0, ...
+        {'mean', DGd_mean_postprandial,   'cov', DGd_cov_postprandial} ); % DGd
     
     CPDFactories{end+1}=  ...
         CPDFactory('Gaussian_CPD', 'DGd.obs', 0, ...
@@ -96,8 +87,9 @@ function [dbn_factory]= make_postprandial_dbn_s3(DGd_mean_postprandial, DGd_cov_
     
     weights_G_minus_h0_map_T0= containers.Map(); % parents in slice t
     weights_G_minus_h0_map_T1= containers.Map(); % parents in slice t+1
-    weights_G_minus_h0_map_T0('G.postprandial')= 1.0;
+    weights_G_minus_h0_map_T0('G.postprandial')= 0.8;
     weights_G_minus_h0_map_T0('Gb.postprandial')= -1.0;
+    weights_G_minus_h0_map_T0('DGd.postprandial')= 0.2;
     CPDFactories{end+1}=  ...
         CPDFactory('Gaussian_CPD', 'DG.postprandial', 0, ...
         {'mean', DG_mean_postprandial, 'cov', DG_cov_postprandial*cov_scale_postprandial}, ...
@@ -109,17 +101,15 @@ function [dbn_factory]= make_postprandial_dbn_s3(DGd_mean_postprandial, DGd_cov_
     
     CPDFactories{end+1} = ...
         CPDFactory('Gaussian_CPD', 'Gcell.C', 0, ...
-        {'mean', 0.0,'cov', G_cov_postprandial*cov_scale_postprandial, 'weights', 0.5}); % Gcell.C = 0.5 * G.C
+        {'mean', 0.0,'cov', G_cov_postprandial*cov_scale_postprandial, 'weights', 0.5}); % G.obs = 0.5 * G.C
     
-    % Enhanced Y with additional parents (G and I)
-    weights_Y0_map_T0= containers.Map();
-    weights_Y0_map_T1= containers.Map();
-    weights_Y0_map_T0('G.postprandial')= 0.0;
-    weights_Y0_map_T0('I.postprandial')= 0.0;
+%     CPDFactories{end+1} = ...
+%        CPDFactory('Gaussian_CPD', 'Gcell.obs', 0, ...
+%        {'mean', 0.0,'cov', G_cov_postprandial*cov_scale_postprandial, 'weights', 1.0}); % G.obs = 0.5 * G.C
+    
     CPDFactories{end+1} = ...
         CPDFactory('Gaussian_CPD', 'Y.postprandial', 0, ...
-        {'mean', Y_mean_postprandial, 'cov', Y_cov_postprandial}, ...
-        weights_Y0_map_T0, weights_Y0_map_T1); % Y = Y_mean
+        {'mean', Y_mean_postprandial, 'cov', Y_cov_postprandial} ); % Y
     
     CPDFactories{end+1} = ...
         CPDFactory('Gaussian_CPD', 'Sb.postprandial', 0, ...
@@ -127,86 +117,69 @@ function [dbn_factory]= make_postprandial_dbn_s3(DGd_mean_postprandial, DGd_cov_
 
     CPDFactories{end+1} = ...
         CPDFactory('Gaussian_CPD', 'Spa.C', 0, ...
-        {'mean', Sb_mean_postprandial, 'cov', Sb_cov_postprandial} ); % Spa.C
+        {'mean', Sb_mean_postprandial, 'cov', Sb_cov_postprandial} ); % Sb
     
-    % Enhanced S with additional parents (Gb and I)
     weights_S0_map_T0= containers.Map(); % parents in slice t
     weights_S0_map_T1= containers.Map(); % parents in slice t+1
-    weights_S0_map_T0('DGd.postprandial')= 0.0;
+    INITIAL_K = K_postprandial;
+    weights_S0_map_T0('DGd.postprandial')= 1.0;
     weights_S0_map_T0('Spa.C')= 0.0;
-    weights_S0_map_T0('Sb.postprandial')= 1.0;
-    weights_S0_map_T0('Y.postprandial')= 0.0;
-    weights_S0_map_T0('Gb.postprandial')= 0.0;
-    weights_S0_map_T0('I.postprandial')= 0.0;
+    weights_S0_map_T0('Sb.postprandial')= 0.8;
+    weights_S0_map_T0('Y.postprandial')= 0.2;
     CPDFactories{end+1}=  ...
         CPDFactory('Gaussian_CPD', 'S.postprandial', 0, ...
         {'mean', 0.0, 'cov', Sb_cov_postprandial*cov_scale_postprandial}, ...
         weights_S0_map_T0, weights_S0_map_T1); % S = 1.0 * Sb
     
-    % Enhanced I with additional parent (DG)
-    weights_I0_map_T0= containers.Map();
-    weights_I0_map_T1= containers.Map();
-    weights_I0_map_T0('DG.postprandial')= 0.0;
     CPDFactories{end+1} = ...
         CPDFactory('Gaussian_CPD', 'I.postprandial', 0, ...
-        {'mean', I_mean_postprandial,'cov', I_cov_postprandial}, ...
-        weights_I0_map_T0, weights_I0_map_T1); % I
-
+        { 'mean', I_mean_postprandial,'cov', I_cov_postprandial} ); % I
+ 
     % eclass2 (time-slice t+1 with parents in the previous time slice)
     CPDFactories{end+1} = ...
        CPDFactory('Gaussian_CPD', 'DGd.postprandial', 1, ...
-        {'mean',DGd_mean_postprandial,'cov', DGd_cov_postprandial, 'weights', 0.0} ); % DGd(t+1) = DGd_mean
+        {'mean',DGd_mean_postprandial,'cov', DGd_cov_postprandial, 'weights', 0.0} ); % Gcelltake(t+1) = 0.0 * Gcelltake(t+1)
     
     CPDFactories{end+1} = ...
        CPDFactory('Gaussian_CPD', 'Gb.postprandial', 1, ...
         {'mean',0.0,'cov', Gb_cov_postprandial*cov_scale_postprandial, 'weights', 1.0} ); % Gb(t+1) = 1.0 * Gb(t)    
 
-    % Enhanced G with additional parent (Y from previous time slice)
     weights_G1_map_T0= containers.Map(); 
     weights_G1_map_T1= containers.Map();
     INITIAL_k1= k1_postprandial;
     INITIAL_k2= k2_postprandial;
     weights_G1_map_T0('DGd.postprandial')= dt_postprandial;
     weights_G1_map_T0('I.postprandial')= -INITIAL_k1*dt_postprandial; % parents in slice t
-    weights_G1_map_T0('G.postprandial')= 1.0-INITIAL_k2*dt_postprandial; % parents in slice t
-    weights_G1_map_T0('DG.postprandial')= k3_postprandial; % parents in slice t
-    weights_G1_map_T0('Y.postprandial')= 0.0; % NEW: feedback from Y (set to 0)
+    weights_G1_map_T0('G.postprandial')= 1.0-INITIAL_k2*dt_postprandial; % parents in slice t+1
+    weights_G1_map_T0('DG.postprandial')= k3_postprandial; % parents in slice t+1
+    weights_G1_map_T0('Gb.postprandial')= 0.01; 
     CPDFactories{end+1} = ...
         CPDFactory('Gaussian_CPD', 'G.postprandial', 1, ...
         {'mean',0.0,'cov', G_cov_postprandial*cov_scale_postprandial}, ...
-        weights_G1_map_T0, weights_G1_map_T1); % G (t+1)
+        weights_G1_map_T0, weights_G1_map_T1); % G (t+1) = 1.0 * G(t) + 1.0 * DGd(t+1) - INITIAL_k1 * dt_postprandial * I(t) - INITIAL_k2 * dt_postprandial * G(t)
 
-    % Enhanced DG with additional parent (I from previous time slice)
     weights_G_minus_h1_map_T0= containers.Map();
     weights_G_minus_h1_map_T1= containers.Map();
     weights_G_minus_h1_map_T0('DG.postprandial')= 0.0;
-    weights_G_minus_h1_map_T0('I.postprandial')= 0.0; % NEW: feedback from I (set to 0)
     weights_G_minus_h1_map_T1('G.postprandial')= 1.0;
     weights_G_minus_h1_map_T1('Gb.postprandial')= -1.0;
     CPDFactories{end+1}=  ...
         CPDFactory('Gaussian_CPD', 'DG.postprandial', 1, ...
         {'mean', 0.0, 'cov', G_cov_postprandial*cov_scale_postprandial}, ...
-        weights_G_minus_h1_map_T0, weights_G_minus_h1_map_T1); % DG(t+1)
+        weights_G_minus_h1_map_T0, weights_G_minus_h1_map_T1); % DG(t+1) = 1.0 * G(t+1) - 1.0 * Gb(t+1)
 
-    % Enhanced Y with additional parents (S from previous time slice and Gb)
+    
     weights_Y1_map_T0= containers.Map();
     weights_Y1_map_T1= containers.Map();
     INITIAL_ALPHA= alpha_postprandial;
     INITIAL_BETA= beta_postprandial;
     weights_Y1_map_T0('Y.postprandial')= 1.0 - dt_postprandial * INITIAL_ALPHA;
     weights_Y1_map_T0('DG.postprandial')= dt_postprandial* INITIAL_ALPHA * INITIAL_BETA;
-    weights_Y1_map_T0('S.postprandial')= 0.0; % NEW: feedback from S (set to 0)
-    weights_Y1_map_T0('Gb.postprandial')= 0.0; % NEW: influence from Gb (set to 0)
     CPDFactories{end+1} = ...
         CPDFactory('Gaussian_CPD', 'Y.postprandial', 1, ...
         {'mean',0.0,'cov', Y_cov_postprandial*cov_scale_postprandial}, ...
-        weights_Y1_map_T0, weights_Y1_map_T1); % Y(t+1)
+        weights_Y1_map_T0, weights_Y1_map_T1); % Y(t+1) = (1.0 - dt_postprandial * INITIAL_ALPHA) * Y(t) + (dt_postprandial* INITIAL_ALPHA * INITIAL_BETA) * DG
     
-    CPDFactories{end+1} = ...
-       CPDFactory('Gaussian_CPD', 'Sb.postprandial', 1, ...
-        {'mean',0.0,'cov', Sb_cov_postprandial*cov_scale_postprandial, 'weights', 1.0} ); % Sb(t+1) = 1.0 * Sb(t)
-    
-    % Enhanced S with all parents
     weights_S1_map_T0= containers.Map();
     weights_S1_map_T1= containers.Map();
     weights_S1_map_T1('DGd.postprandial')= K_postprandial;
@@ -217,22 +190,20 @@ function [dbn_factory]= make_postprandial_dbn_s3(DGd_mean_postprandial, DGd_cov_
     CPDFactories{end+1}=  ...
         CPDFactory('Gaussian_CPD', 'S.postprandial', 1, ...
         {'mean', 0.0, 'cov', Sb_cov_postprandial*cov_scale_postprandial}, ...
-        weights_S1_map_T0, weights_S1_map_T1); % S(t+1) = K * DGd(t+1) + 1.0 * Sb(t+1) + 1.0 * Y(t+1)
+        weights_S1_map_T0, weights_S1_map_T1); % S(t+1) = Sb_mean_postprandial + 0.0 * S(t) + INITIAL_K * DG(t+1) + 1.0 * Sb(t+1) + 1.0 * Y(t+1)
     
-    % Enhanced I
     weights_I1_map_T0= containers.Map(); 
     weights_I1_map_T1= containers.Map(); 
     INITIAL_GAMMA= gamma_postprandial;
     weights_I1_map_T0('I.postprandial')= 1 - INITIAL_GAMMA*dt_postprandial;
-    weights_I1_map_T0('S.postprandial')= k4_postprandial*dt_postprandial;
+    weights_I1_map_T0('S.postprandial')= k4_postprandial*dt_postprandial; % fast
     CPDFactories{end+1}= ...
         CPDFactory('Gaussian_CPD', 'I.postprandial', 1, ...
         {'mean', 0.0, 'cov', I_cov_postprandial*cov_scale_postprandial}, ...
-        weights_I1_map_T0, weights_I1_map_T1); % I(t+1) = (1 - GAMMA*dt) * I(t) + k4*dt * S(t)
+        weights_I1_map_T0, weights_I1_map_T1); % I(t+1) = (1 - INITIAL_GAMMA*dt_postprandial) * I(t) + dt_postprandial * S(t)
     
     % Final DBN factory
     dbn_factory= DBNFactory( ...
         node_names, edges_intra, edges_inter, ...
         eclass1_map, eclass2_map, CPDFactories);
 end
-
