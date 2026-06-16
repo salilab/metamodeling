@@ -652,7 +652,7 @@ class BayesMM:
         P_pred_over_time      = [[] for _ in self.models]
 
         stat_couplings = [c for c in couplings if c.get('coupling_type', 'statistical') != 'physical']
-        phys_couplings = [c for c in couplingsif c.get('coupling_type') == 'physical']
+        phys_couplings = [c for c in couplings if c.get('coupling_type') == 'physical']
         coupling_states = [c['mu_c'].clone().detach().requires_grad_(True) for c in stat_couplings]
         coupling_covs = [(c['sigma_c'].clone().detach().requires_grad_(True) ** 2).view(1, 1) for c in stat_couplings]
 
