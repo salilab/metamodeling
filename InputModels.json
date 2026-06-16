@@ -1,0 +1,123 @@
+{
+    "PXR": {
+        "noise_terms":{
+            "trans_cov_scale" : 0.01,
+            "emis_cov_scale" : 1.0,
+            "obs_noise_scale" : 0.001,
+            "noise_model_type": "time-variant"
+        },
+        "misc":{
+            "model_dt": 0.01,
+            "model_function_name":"ODE_eqs_model_PXR",
+            "input_model_plot":"input_model_PXR.png",
+            "input_model_with_obs_plot":"input_model_PXR_with_obs.png",
+            "surrogate_with_observables_plot":"surrogate_PXR_with_observables.png"
+        },
+        "model_parameters": {
+            "InitConc": [0.0, 1.0, 21.3, 3.0],
+            "InitConc_std": [null, null, null, null],
+            "paramNames":["CYP_0, RNA_0, EC50_mean, EC50_stdev, k_inact, k_rnadeg, k_cypdeg, p, q"],
+            "k": [3.0, 0.0, 8.83186552, 0.73, 0.0530, 0.044, 0.0282, 0.313, 4.34],
+            "k_std": [null, null, null, null, null, null, null, null, null],
+            "species": ["$C^{PXR}_{PXR}$", "$C^{PXR}_{RNA}$", "$C^{PXR}_{RIF}$", "$C^{PXR}_{CYP}$"],
+            "units": ["uM", "uM", "uM", "uM"]
+        }
+    },
+    "MM": {
+        "noise_terms":{
+            "trans_cov_scale" : 0.01,
+            "emis_cov_scale" : 1.0,
+            "obs_noise_scale" : 10,
+            "noise_model_type": "time-variant"
+        },
+        "misc":{
+            "model_dt": 0.01,
+            "model_function_name":"ODE_eqs_model_MM",
+            "input_model_plot":"input_model_MM.png",
+            "input_model_with_obs_plot":"input_model_MM_with_obs.png",
+            "surrogate_with_observables_plot":"surrogate_MM_with_observables.png"
+        },
+        "model_parameters": {
+            "InitConc": [21.3, 3.0, 0.0402],
+            "InitConc_std": [null, null, null],
+            "paramNames":["C3A4_in, C3A4_sub, CYP_0, kcat, Km, Ki"],
+            "k": [0.40,0.93,3.0,21.96,99.5,0.1],
+            "k_std": [null, null, null, null, null, null],
+            "species": ["$C^{MM}_{SUB}$", "$C^{MM}_{CYP}$", "$C^{MM}_{CL}$"],
+            "units": ["uM","uM", "uM"]
+        }
+    },
+    "ADMETAI": {
+        "noise_terms":{
+            "trans_cov_scale" : 0.01,
+            "emis_cov_scale" : 1.0,
+            "obs_noise_scale" : 0.001,
+            "noise_model_type": "time-variant"
+        },
+        "misc":{
+            "model_dt": 0.01,
+            "model_function_name":"ODE_eqs_model_ADMETAI",
+            "input_model_plot":"input_model_ADMETAI.png",
+            "input_model_with_obs_plot":"input_model_ADMETAI_with_obs.png",
+            "surrogate_with_observables_plot":"surrogate_ADMETAI_with_observables.png"
+        },
+        "model_parameters": {
+            "InitConc": [21.3, 100],
+            "InitConc_std": [null, null],
+            "paramNames":["CL"],
+            "k": [100,0],
+            "k_std": [null,null],
+            "species": ["$C^{ADMETAI}_{SUB}$", "$C^{ADMETAI}_{CL}$"],
+            "units": ["uM", "uM"]
+        }
+    },
+    "human": {
+        "noise_terms":{
+            "trans_cov_scale" : 0.01,
+            "emis_cov_scale" : 1.0,
+            "obs_noise_scale" : 0.001,
+            "noise_model_type": "time-variant"
+        },
+        "misc":{
+            "model_dt": 0.05,
+            "model_function_name":"ODE_eqs_model_human",
+            "input_model_plot":"input_model_human.png",
+            "input_model_with_obs_plot":"input_model_human_with_obs.png",
+            "surrogate_with_observables_plot":"surrogate_human_with_observables.png"
+        },
+        "model_parameters": {
+            "InitConc": [11.47, 0, 0, 0, 5.72],
+            "InitConc_std": [null, null, null, null, null],
+            "k": [
+                1.55, 0.694, 1.68, 0.348, 4.67, 0.449, 0.204, 52.3
+            ],
+            "k_std": [null, null, null, null, null, null, null, null],
+            "species": ["$C^{H}_p$", "$C^{H}_{lung}$", "$C^{H}_{cell}$", "$C^{H}_{case}$", "$C^{H}_{CL}$"],
+            "units": ["mM", "mM", "mM", "mM", "mM"]
+        }
+    },
+    "rabbit": {
+        "noise_terms":{
+            "trans_cov_scale" : 0.01,
+            "emis_cov_scale" : 1.0,
+            "obs_noise_scale" : 0.001,
+            "noise_model_type": "time-variant"
+        },
+        "misc":{
+            "model_dt": 0.05,
+            "model_function_name":"ODE_eqs_model_rabbit",
+            "input_model_plot":"input_model_rabbit.png",
+            "input_model_with_obs_plot":"input_model_rabbit_with_obs.png",
+            "surrogate_with_observables_plot":"surrogate_rabbit_with_observables.png"
+        },
+        "model_parameters": {
+            "InitConc": [48, 0, 0, 0, 0],
+            "InitConc_std": [null, null, null, null, null],
+            "k": [
+                0.153, 2.706, 0.155, 2.907, 10, 3.897, 0.036, 0.791, 12.5, 13.67],
+            "k_std": [null, null, null, null, null, null, null, null, null, null],
+            "species": ["$C^{R}_p$", "$P^{R}$", "$C^{R}_{lung}$", "$C^{R}_{cell}$", "$C^{R}_{case}$"],
+            "units": ["mM", "mM", "mM", "mM", "mM"]
+        }
+    }
+}
