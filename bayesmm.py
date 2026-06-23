@@ -543,13 +543,12 @@ class BayesMM:
 
         prop_var  = sum(a * a * v for a, v in zip(alphas, vars_all))
         total_var = prop_var + tau2
-
         try:
-            residual = c_dict['g_c'](z_mapped, t=t)
+            r = c_dict['g_c'](z_mapped, t=t)
         except TypeError:
-            residual = c_dict['g_c'](z_mapped)
+            r = c_dict['g_c'](z_mapped)
 
-        residual = residual.to(device=device, dtype=dtype).reshape(())
+        r = r.to(device=device, dtype=dtype).reshape(())
 
         var_name_self = c_dict['vars'][local_idx]
         var_idx_self  = data_list[m_self].columns.get_loc(var_name_self) - 1
@@ -558,7 +557,11 @@ class BayesMM:
         K_j           = alpha_j * var_j / total_var
 
         x_corrected                  = x_up.clone()
-        x_corrected[var_idx_self]    = x_corrected[var_idx_self] - K_j * residual
+        # r is used as a residual
+        x_corrected[var_idx_self]    = x_corrected[var_idx_self] - K_j * r
+        if not c_dict["Kalman_style"]:
+            # r is used as a result
+            x_corrected[var_idx_self] = r
         return x_corrected
 
     # Constraint-aware intra-model state propagation
@@ -1002,6 +1005,7 @@ class PhysicalCoupling:
     lambdas       : List[float] = field(default_factory=list)
     shifts        : List[float] = field(default_factory=list)
     weights       : List       = field(default_factory=list)
+    Kalman_style  : bool = True
 
     def as_dict(self) -> dict:
         n = len(self.model_indices)
@@ -1018,6 +1022,7 @@ class PhysicalCoupling:
                 self.weights if self.weights
                 else [torch.tensor(1.0 / n) for _ in range(n)]
             ),
+            'Kalman_style': self.Kalman_style,
         }
 
 def make_physical_coupling(
@@ -1029,6 +1034,7 @@ def make_physical_coupling(
     shifts        : Optional[Sequence[float]] = None,
     #sigma_c_floor : float = 0.05,
     sigma_c_floor : float = 0.005,
+    Kalman_style: bool = True
 ) -> dict:
     """
     Build a physical coupling dict compatible with BayesMM.inference().
@@ -1050,6 +1056,7 @@ def make_physical_coupling(
         sigma_c       = sigma_c_safe,
         lambdas       = list(lambdas) if lambdas is not None else [1.0] * n,
         shifts        = list(shifts)  if shifts  is not None else [0.0] * n,
+        Kalman_style  = Kalman_style
     )
     return pc.as_dict()
 # }}}
